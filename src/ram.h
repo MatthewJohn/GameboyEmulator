@@ -14,10 +14,14 @@ public:
     uint8_t* get_ref(uint16_t a);
     void set(uint16_t address, uint8_t val);
     void set(int address, uint8_t val);
-    void dec(uint16_t address);
-    void dec(int address);
-    void inc(uint16_t address);
-    void inc(int address);
+    void v_set(uint16_t address, uint8_t val);
+    void v_set(int address, uint8_t val);
+    uint8_t dec(uint16_t address);
+    uint8_t dec(int address);
+    uint8_t inc(uint16_t address);
+    uint8_t inc(int address);
+    uint8_t v_inc(uint16_t address);
+    uint8_t v_inc(int address);
     void stack_push(uint16_t &sp_val, uint8_t pc_val);
     void stack_push(uint16_t &sp_val, uint16_t pc_val);
     uint8_t stack_pop8(uint16_t &sp_val);
@@ -33,6 +37,19 @@ public:
     RamSubset get_high_ram();
     void load_bios(char *bios_path);
     void load_rom(char *rom_path);
+    
+    unsigned int get_ram_bit(uint16_t address, unsigned int bit_shift);
+    uint8_t set_ram_bit(uint16_t address, uint8_t bit_shift, unsigned int val);
+    
+    // Video addresses
+    const uint16_t LCDC_CONTROL_ADDR = (uint16_t)0xff40; // LCD Control
+    const uint16_t LCDC_STATUS_ADDR = (uint16_t)0xff41; // LCD status
+    const uint16_t LCDC_SCY = (uint16_t)0xff42; // Background Scroll Y
+    const uint16_t LCDC_SCX = (uint16_t)0xff43; // Background Scroll X
+    const uint16_t LCDC_LY_ADDR = (uint16_t)0xff44; // Current line draw iterator
+    const uint16_t LCDC_LYC_ADDR = (uint16_t)0xff45; // Custom location for interupt if LY equals this
+    const uint16_t LCDC_WY_ADDR = (uint16_t)0xff4a; // Window y position
+    const uint16_t LCDC_WX_ADDR = (uint16_t)0xff4b; // Window x position
     
 private:
     // @TODO Reduce this to exclude mappings to other

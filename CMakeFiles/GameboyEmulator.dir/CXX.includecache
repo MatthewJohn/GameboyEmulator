@@ -21,6 +21,8 @@ iostream
 -
 string
 -
+helper.h
+/home/matthew/w/g/gameboy-emulator/src/helper.h
 ram.h
 /home/matthew/w/g/gameboy-emulator/src/ram.h
 ./vpu.h
@@ -31,6 +33,8 @@ cpu.h
 /home/matthew/w/g/gameboy-emulator/src/cpu.cpp
 cpu.h
 /home/matthew/w/g/gameboy-emulator/src/cpu.h
+helper.h
+/home/matthew/w/g/gameboy-emulator/src/helper.h
 iomanip
 -
 iostream
@@ -46,6 +50,12 @@ ram.h
 ./vpu.h
 /home/matthew/w/g/gameboy-emulator/src/./vpu.h
 
+/home/matthew/w/g/gameboy-emulator/src/helper.h
+iostream
+-
+ios
+-
+
 /home/matthew/w/g/gameboy-emulator/src/ram.cpp
 iostream
 -
@@ -53,6 +63,8 @@ fstream
 -
 cstring
 -
+helper.h
+/home/matthew/w/g/gameboy-emulator/src/helper.h
 ram.h
 /home/matthew/w/g/gameboy-emulator/src/ram.h
 
@@ -75,6 +87,8 @@ memory
 /home/matthew/w/g/gameboy-emulator/src/vpu.cpp
 vpu.h
 /home/matthew/w/g/gameboy-emulator/src/vpu.h
+helper.h
+/home/matthew/w/g/gameboy-emulator/src/helper.h
 iostream
 -
 unistd.h

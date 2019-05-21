@@ -125,6 +125,8 @@ private:
     uint8_t get_zero_flag();
     void set_half_carry(uint8_t original_val, uint8_t input);
     void set_half_carry(uint16_t original_val, uint16_t input);
+    void set_half_carry_sub(uint8_t original_val, uint8_t input);
+    void set_half_carry_sub(uint16_t original_val, uint16_t input);
     uint8_t get_carry_flag();
 
     void op_Load(reg8 *dest);

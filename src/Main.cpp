@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include "helper.h"
 #include "ram.h"
 #include "./vpu.h"
 #include "cpu.h"
@@ -45,7 +46,7 @@ int main(int argc, char* args[])
 //		printf("Couldn't open display.\n");
 //		return -1;
 //	}
-
+    Helper::init();
     RAM *ram_inst = new RAM();
     char bios_path[] = "./copyright/DMG_ROM.bin";
     char rom_path[] = "./copyright/Tetris (JUE) (V1.1) [!].gb";
@@ -59,10 +60,23 @@ int main(int argc, char* args[])
     while (cpu_inst->is_running())
     {
         cpu_inst->tick();
-        if (! DISABLE_VPU)
+        if (! DISABLE_VPU) {
             vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+//            vpu_inst->tick();
+        }
 
-        vpu_inst->process_events();
+        //vpu_inst->process_events();
     }
 
     std::cin.get();

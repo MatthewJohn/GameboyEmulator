@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstring>
 
+#include "helper.h"
 #include "ram.h"
 #define DEBUG 0
 
@@ -58,7 +59,8 @@ void RAM::stack_push(uint16_t &sp_val, uint16_t pc_val) {
 uint8_t RAM::stack_pop8(uint16_t &sp_val) {
     // Obtain value from stack and decrease SP value,
     uint8_t dest = this->get_val(sp_val);
-    std::cout << "got: " << std::hex << (int)dest << " from " << (int)sp_val << std::endl;
+    if (DEBUG)
+        std::cout << "got: " << std::hex << (int)dest << " from " << (int)sp_val << std::endl;
     sp_val ++;
     return dest;
 }
@@ -75,6 +77,14 @@ uint16_t RAM::stack_pop(uint16_t &sp_val) {
 }
 
 void RAM::set(int address, uint8_t val) {
+    // If attempting to inc the LCD LY attribute, just
+    // reset it
+    if ((unsigned int)address == 0xFF44)
+        this->v_set(address, 0x00);
+    else
+        this->v_set(address, val);
+}
+void RAM::v_set(int address, uint8_t val) {
     if (address < 0x8000) {
         std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
         std::cout << std::hex << "Forbidden RAM write: " << (int)val << " at " << (int)address << std::endl;
@@ -87,18 +97,59 @@ void RAM::set(int address, uint8_t val) {
 void RAM::set(uint16_t address, uint8_t val) {
     this->set((int)address, val);
 }
-void RAM::dec(int address) {
+void RAM::v_set(uint16_t address, uint8_t val) {
+    this->v_set((int)address, val);
+}
+uint8_t RAM::dec(int address) {
     this->memory[address] --;
+    return this->memory[address];
 }
-void RAM::dec(uint16_t address) {
-    this->dec((int)address);
+uint8_t RAM::dec(uint16_t address) {
+    return this->dec((int)address);
 }
-void RAM::inc(int address) {
+uint8_t RAM::inc(int address) {
+    // If attempting to inc the LCD LY attribute, just
+    // reset it
+    if ((unsigned int)address == 0xFF44)
+    {
+        this->v_set(address, 0x00);
+        return (uint8_t)0x00;
+    }
+    else
+        return this->v_inc(address);
+}
+uint8_t RAM::v_inc(int address) {
     this->memory[address] ++;
+    return this->memory[address];
 }
-void RAM::inc(uint16_t address) {
-    this->inc((int)address);
+uint8_t RAM::inc(uint16_t address) {
+    // If attempting to inc the LCD LY attribute, just
+    // reset it
+    if ((unsigned int)address == 0xFF44)
+    {
+        this->v_set(address, 0x00);
+        return (uint8_t)0x00;
+    }
+    else
+        return this->inc((int)address);
 }
+uint8_t RAM::v_inc(uint16_t address) {
+    return this->v_inc((int)address);
+}
+
+unsigned int RAM::get_ram_bit(uint16_t address, unsigned int bit_shift) {
+    return ((this->get_val(address) & (1U  << bit_shift)) >> bit_shift);
+}
+uint8_t RAM::set_ram_bit(uint16_t address, uint8_t bit_shift, unsigned int val) {
+    uint8_t source = this->get_val(address);
+    if (val == 1)
+        source |= (1 << bit_shift);
+    else
+        source &= (0xff ^ (1 << bit_shift));
+    this->v_set(address, source);
+    return source;
+}
+
 
 
 RamSubset RAM::get_io_registers() {
@@ -110,38 +161,43 @@ RamSubset RAM::get_high_ram() {
 }
 
 void RAM::load_bios(char *bios_path) {
-// Open file  
-std::ifstream infile(bios_path, std::ios::binary);  
+    // Open file  
+    std::ifstream infile(bios_path, std::ios::binary);  
 
-// Iterate through bytes in file and store in memory  
-size_t addr = 0;
-while (true) {
-  uint8_t ch = infile.get();
-  if (infile.eof()) {
-     break;
-  }
-  this->memory[addr] = (uint8_t)ch;
-  std::cout << std::hex << (int)addr << " " << (int)ch << " " << (int)this->memory[addr] << std::endl;
+    // Iterate through bytes in file and store in memory  
+    size_t addr = 0;
+    while (true) {
+        uint8_t ch = infile.get();
+        if (infile.eof()) {
+            break;
+        }
+        this->memory[addr] = (uint8_t)ch;
 
-  addr++;  
-}  
-std::cin.get();
-infile.close();
+        // DEBUG for loading BIOS
+        if (DEBUG)
+        {
+            std::cout << std::hex << (int)addr << " " << (int)ch << " " << (int)this->memory[addr] << std::endl;
+            //std::cin.get();
+        }
+
+        addr++;  
+    }
+    infile.close();
 }
 
 void RAM::load_rom(char *rom_path) {
-// Open file  
-std::ifstream infile(rom_path, std::ios::binary);  
+    // Open file  
+    std::ifstream infile(rom_path, std::ios::binary);  
 
-// Iterate through bytes in file and store in memory  
-size_t addr = 0;
-while (true) {
-  uint8_t ch = infile.get();
-  if (infile.eof()) {
-     break;
-  }
-  this->memory[addr + 256] = (uint8_t)ch;
-  addr++;
-}  
-infile.close();
+    // Iterate through bytes in file and store in memory  
+    size_t addr = 0;
+    while (true) {
+        uint8_t ch = infile.get();
+        if (infile.eof()) {
+            break;
+        }
+        this->memory[addr + 256] = (uint8_t)ch;
+        addr++;
+    }
+    infile.close();
 }
