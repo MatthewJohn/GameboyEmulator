@@ -8,7 +8,7 @@
 // #include <string.h>
 #include <memory>
 
-#define DEBUG 0
+#define DEBUG 1
 
 VPU::VPU(RAM *ram) {
     Helper::init();
@@ -78,7 +78,7 @@ void VPU::reset_ly() {
 }
 
 void VPU::reset_lx() {
-    this->process_events();
+    //this->process_events();
     this->current_pixel_x = 0;
     uint8_t current_y = this->ram->v_inc(this->ram->LCDC_LY_ADDR);
     if (current_y == this->ram->get_val(this->ram->LCDC_LYC_ADDR))
@@ -148,10 +148,10 @@ uint8_t VPU::get_pixel_color() {
     // Get byte index, by determining where pixel is in the byte (which contains half a line of colours)
     uint16_t byte_addr = (uint16_t)(
         (unsigned long)this->get_current_tile_data_address() +
-         (((((unsigned int)this->get_background_scroll_y() + (unsigned int)this->get_current_y()) % this->TILE_HEIGHT) * this->TILE_WIDTH) + // Y position x 2, since there's two bytes per row (4 pixels per byte)
-          (((unsigned int)this->get_background_scroll_x() + (unsigned int)this->get_current_x()) % this->TILE_WIDTH) / 4)
+         (pos.x / 4) + // Y position x 2, since there's two bytes per row (4 pixels per byte)
+          (pos.y * 2)
     );
-    int byte_index = (pos.x % (this->TILE_WIDTH / 2)) * 2;
+    unsigned int byte_index = (pos.x % (this->TILE_WIDTH / 2)) * 2;
     //std::cout << std::hex << pos.x << std::endl;
 //    if (this->get_current_tile_data_address() != 0x8800)
 //        std::cout << std::hex << (unsigned int)this->get_current_tile_data_address() << std::endl;
@@ -163,13 +163,10 @@ uint8_t VPU::get_pixel_color() {
             " tile x pos: " << pos.x << std::endl <<
             "x: " << (unsigned int)this->get_current_x() << ", y: " << (unsigned int)this->get_current_y() << std::endl <<
             " colour byte: " << (unsigned int)colour_byte <<
-            " colour nibble: " << (unsigned int)((colour_byte >> byte_index) & (0x04)) <<
+            " tile index: " << byte_index <<
+            " colour nibble: " << (unsigned int)((colour_byte >> byte_index) & (0x03)) <<
             " Tile data location " << this->get_tile_data_address(this->ram->get_val(this->get_current_map_address())) <<
-            " Memory location: " << 
-        (uint16_t)
-        ((unsigned int)this->get_current_tile_data_address() +
-         (pos.y * 2) + // Y position x 2, since there's two bytes per row (4 pixels per byte)
-         (pos.x / 4)) << std::endl;
+            " Memory location: " << (unsigned int)byte_addr << std::endl;
          std::cout << (unsigned int)this->get_tile_map_index_from_current_coord() << std::endl;
          std::cout << (unsigned long)this->VRAM_BG_MAPS[this->get_background_map()] << std::endl;
          std::cout << (unsigned long)this->get_tile_map_index_from_current_coord() << std::endl;
@@ -178,7 +175,7 @@ uint8_t VPU::get_pixel_color() {
          std::cout << (unsigned int)this->ram->get_val(this->get_current_tile_data_address()) << std::endl;
          //std::cin.get();
     }
-    return (colour_byte >> byte_index) & uint16_t(0x04);
+    return (uint8_t)((colour_byte >> byte_index) & (uint8_t)(0x03));
 }
 
 void VPU::tear_down() {
@@ -191,16 +188,16 @@ void VPU::process_pixel() {
     //
     uint8_t color = this->get_pixel_color();
     switch((unsigned int)color) {
-        case 0x00:
+        case 0:
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
             break;
-        case 0x01:
+        case 1:
             SDL_SetRenderDrawColor(renderer, 86, 86, 86, 0);
             break;
-        case 0x02:
+        case 2:
             SDL_SetRenderDrawColor(renderer, 172, 172, 172, 0);
             break;
-        case 0x03:
+        case 3:
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
             break;
         default:
@@ -210,8 +207,8 @@ void VPU::process_pixel() {
     };
     SDL_RenderDrawPoint(this->renderer, (int)this->get_current_x(), (int)this->get_current_y());
     //this->process_events();
-    if (DEBUG && color != 0x0)
-        std::cout << std::hex << "Setting Pixel color: " << (unsigned int)this->get_current_x() << " " << (unsigned int)this->get_current_y() << " " << (int)color << std::endl;
+    //if (DEBUG && color != 0x0)
+    //    std::cout << std::hex << "Setting Pixel color: " << (unsigned int)this->get_current_x() << " " << (unsigned int)this->get_current_y() << " " << (int)color << std::endl;
 }
 
 // Return the on-screen X coornidate of the pixel being drawn 
