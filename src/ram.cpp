@@ -4,7 +4,7 @@
 
 #include "helper.h"
 #include "ram.h"
-#define DEBUG 0
+#define DEBUG 1
 
 RAM::RAM() {
     // Initialise memory to 0.

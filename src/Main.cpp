@@ -62,9 +62,9 @@ int main(int argc, char* args[])
         cpu_inst->tick();
         if (! DISABLE_VPU) {
             vpu_inst->tick();
-//            vpu_inst->tick();
-//            vpu_inst->tick();
-//            vpu_inst->tick();
+            //vpu_inst->tick();
+            //vpu_inst->tick();
+            //vpu_inst->tick();
 //            vpu_inst->tick();
 //            vpu_inst->tick();
 //            vpu_inst->tick();

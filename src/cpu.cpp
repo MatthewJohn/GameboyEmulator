@@ -7,9 +7,9 @@
 #include <iostream>
 #include <string.h>
 
-#define DEBUG 0
+#define DEBUG 1
 #define INTERUPT_DEBUG 1
-#define STEPIN 0xe7
+#define STEPIN 0xc
 #define STOP_ON_BAD_OPCODE 1
 #define STOP_BEFORE_ROM 1
 
@@ -108,7 +108,10 @@ void CPU::tick() {
         
     // Determine stepped-in before PC is incremented
     if ((STEPIN == 1 || (STEPIN + 1) == this->r_pc.value || STEPIN == this->r_pc.value) && STEPIN != 0)
+    {
+        std::cout << (unsigned int)this->ram->get_val((uint16_t)0x8010) << (unsigned int)this->ram->get_val(0x8011) << (unsigned int)this->ram->get_val(0x8012) << (unsigned int)this->ram->get_val(0x8013) << std::endl;
         this->stepped_in = true;
+    }
 
     // Read value from memory
     int op_val = (int)this->get_inc_pc_val8();

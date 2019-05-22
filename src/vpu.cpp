@@ -8,7 +8,7 @@
 // #include <string.h>
 #include <memory>
 
-#define DEBUG 1
+#define DEBUG 0
 
 VPU::VPU(RAM *ram) {
     Helper::init();
@@ -91,9 +91,9 @@ void VPU::tick() {
     
     // Check X position
     this->current_pixel_x ++;
-    uint8_t current_y = this->get_current_y();
     if (this->get_current_x() >= this->MAX_LX)
-        this->reset_lx();    
+        this->reset_lx();
+    uint8_t current_y = this->get_current_y();
 
     // Check if LY counter is the max value
     // and reset
@@ -148,8 +148,8 @@ uint8_t VPU::get_pixel_color() {
     // Get byte index, by determining where pixel is in the byte (which contains half a line of colours)
     uint16_t byte_addr = (uint16_t)(
         (unsigned long)this->get_current_tile_data_address() +
-         (((unsigned int)this->get_background_scroll_y() + (unsigned int)this->get_current_y()) % this->TILE_HEIGHT * 2) + // Y position x 2, since there's two bytes per row (4 pixels per byte)
-         (((unsigned int)this->get_background_scroll_x() + (unsigned int)this->get_current_x()) % this->TILE_WIDTH / 4)
+         (((((unsigned int)this->get_background_scroll_y() + (unsigned int)this->get_current_y()) % this->TILE_HEIGHT) * this->TILE_WIDTH) + // Y position x 2, since there's two bytes per row (4 pixels per byte)
+          (((unsigned int)this->get_background_scroll_x() + (unsigned int)this->get_current_x()) % this->TILE_WIDTH) / 4)
     );
     int byte_index = (pos.x % (this->TILE_WIDTH / 2)) * 2;
     //std::cout << std::hex << pos.x << std::endl;
@@ -159,7 +159,9 @@ uint8_t VPU::get_pixel_color() {
     if (DEBUG && (unsigned int)this->get_current_tile_data_address() != 0x8000) {
         std::cout << std::hex << "Colour Byte index: " << byte_index <<
             " tile width: " << this->TILE_WIDTH <<
-            " tile x pos: " << pos.x <<
+            " tile y pos: " << pos.y << std::endl <<
+            " tile x pos: " << pos.x << std::endl <<
+            "x: " << (unsigned int)this->get_current_x() << ", y: " << (unsigned int)this->get_current_y() << std::endl <<
             " colour byte: " << (unsigned int)colour_byte <<
             " colour nibble: " << (unsigned int)((colour_byte >> byte_index) & (0x04)) <<
             " Tile data location " << this->get_tile_data_address(this->ram->get_val(this->get_current_map_address())) <<
@@ -204,7 +206,7 @@ void VPU::process_pixel() {
         default:
             // Random colour
             SDL_SetRenderDrawColor(renderer, 255, 0, 128, 0);
-            std::cout << std::hex << "Unknown color: " << (unsigned int)color << std::endl;
+            //std::cout << std::hex << "Unknown color: " << (unsigned int)color << std::endl;
     };
     SDL_RenderDrawPoint(this->renderer, (int)this->get_current_x(), (int)this->get_current_y());
     //this->process_events();
@@ -244,12 +246,8 @@ unsigned int VPU::get_tile_map_index_from_current_coord() {
 uint16_t VPU::get_tile_data_address(uint8_t tile_number) {
     uint8_t offset;
     unsigned int mode = (unsigned int)this->get_background_data_type();
-    if (tile_number)
-        std::cout << (int)tile_number << std::endl;
     if (mode) {
         offset = (uint8_t)((tile_number & 0x80) ? (tile_number - 128) : tile_number);
-        if (offset)
-            std::cout << "Signed: " << (int)offset << std::endl;
     }
     else
         offset = tile_number;
