@@ -7,9 +7,9 @@
 #include <iostream>
 #include <string.h>
 
-#define DEBUG 1
+#define DEBUG 0
 #define INTERUPT_DEBUG 1
-#define STEPIN 0xc
+#define STEPIN 0xfe
 #define STOP_ON_BAD_OPCODE 1
 #define STOP_BEFORE_ROM 1
 

@@ -4,7 +4,7 @@
 
 #include "helper.h"
 #include "ram.h"
-#define DEBUG 1
+#define DEBUG 0
 
 RAM::RAM() {
     // Initialise memory to 0.
@@ -177,12 +177,12 @@ void RAM::load_bios(char *bios_path) {
         if (DEBUG)
         {
             std::cout << std::hex << (int)addr << " " << (int)ch << " " << (int)this->memory[addr] << std::endl;
-            //std::cin.get();
         }
 
         addr++;  
     }
     infile.close();
+    //std::cin.get();
 }
 
 void RAM::load_rom(char *rom_path) {
@@ -196,8 +196,12 @@ void RAM::load_rom(char *rom_path) {
         if (infile.eof()) {
             break;
         }
-        this->memory[addr + 256] = (uint8_t)ch;
+        // Skip first 256 bytes?
+        if (addr > 255)
+            this->memory[addr] = (uint8_t)ch;
         addr++;
+        //std::cout << std::hex << (int)(addr + 255) << " " << (int)ch << " " << (int)this->memory[addr] << std::endl;
     }
     infile.close();
+    std::cin.get();
 }
