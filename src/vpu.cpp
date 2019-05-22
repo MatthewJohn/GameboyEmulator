@@ -112,7 +112,7 @@ void VPU::tick() {
         return;
 
     // If not at end of screen, in either x or y, process pixel
-    if (current_y < this->SCREEN_HEIGHT && this->get_current_x() < this->SCREEN_WIDTH)
+    if (current_y <= this->SCREEN_HEIGHT && this->get_current_x() <= this->SCREEN_WIDTH)
         this->process_pixel();
 }
 
@@ -137,7 +137,7 @@ uint8_t VPU::get_background_data_type() {
 
 vec_2d VPU::get_pixel_tile_position() {
     vec_2d pos;
-    pos.x = ((unsigned int)this->get_background_scroll_x() + (unsigned int)this->get_current_x()) % this->TILE_WIDTH;
+    pos.x = (unsigned int)((unsigned int)this->get_background_scroll_x() + (unsigned int)this->get_current_x()) % this->TILE_WIDTH;
     pos.y = ((unsigned int)this->get_background_scroll_y() + (unsigned int)this->get_current_y()) % this->TILE_HEIGHT;
     return pos;
 }
@@ -148,23 +148,33 @@ uint8_t VPU::get_pixel_color() {
     // Get byte index, by determining where pixel is in the byte (which contains half a line of colours)
     uint16_t byte_addr = (uint16_t)(
         (unsigned long)this->get_current_tile_data_address() +
-         (pos.x / 4) + // Y position x 2, since there's two bytes per row (4 pixels per byte)
-          (pos.y * 2)
+         (pos.x / 4) + (pos.y * 2)
     );
-    unsigned int byte_index = (pos.x % (this->TILE_WIDTH / 2)) * 2;
+    // Unset last bit of address to get lower byte
+    byte_addr &= (uint16_t)0xfffe;
+
+    //
+    unsigned int byte_index = (7 - (pos.x % (this->TILE_WIDTH)));
     //std::cout << std::hex << pos.x << std::endl;
 //    if (this->get_current_tile_data_address() != 0x8800)
 //        std::cout << std::hex << (unsigned int)this->get_current_tile_data_address() << std::endl;
-    uint8_t colour_byte = this->ram->get_val(byte_addr);
+    //uint8_t colour_byte = (this->ram->get_val(byte_addr) >> byte_addr);
+    uint8_t byte1 = this->ram->get_val(byte_addr);
+    uint8_t byte2 = this->ram->get_val(byte_addr | (uint16_t)0x0001);
+    uint8_t colour_byte = ((uint8_t)((byte1 >> byte_index) & (uint8_t)(0x01)) |
+                           (uint8_t)((byte2 >> byte_index) & (uint8_t)(0x01) << 1));
+    
     if (DEBUG && (unsigned int)this->get_current_tile_data_address() != 0x8000) {
+        std::cout << std::hex << "byte1: " << (unsigned int)byte1 << " byte2: " << (unsigned int)byte2 << std::endl;
         std::cout << std::hex << "Colour Byte index: " << byte_index <<
             " tile width: " << this->TILE_WIDTH <<
             " tile y pos: " << pos.y << std::endl <<
             " tile x pos: " << pos.x << std::endl <<
-            "x: " << (unsigned int)this->get_current_x() << ", y: " << (unsigned int)this->get_current_y() << std::endl <<
+            " bit1: " << (unsigned int)((byte1 >> byte_index) & (uint8_t)(0x01)) <<
+            " bit2: " << (unsigned int)((byte2 >> byte_index) & (uint8_t)(0x01) << 1) <<
+            "  x: " << (unsigned int)this->get_current_x() << ", y: " << (unsigned int)this->get_current_y() << std::endl <<
             " colour byte: " << (unsigned int)colour_byte <<
             " tile index: " << byte_index <<
-            " colour nibble: " << (unsigned int)((colour_byte >> byte_index) & (0x03)) <<
             " Tile data location " << this->get_tile_data_address(this->ram->get_val(this->get_current_map_address())) <<
             " Memory location: " << (unsigned int)byte_addr << std::endl;
          std::cout << (unsigned int)this->get_tile_map_index_from_current_coord() << std::endl;
@@ -175,7 +185,7 @@ uint8_t VPU::get_pixel_color() {
          std::cout << (unsigned int)this->ram->get_val(this->get_current_tile_data_address()) << std::endl;
          //std::cin.get();
     }
-    return (uint8_t)((colour_byte >> byte_index) & (uint8_t)(0x03));
+    return colour_byte;
 }
 
 void VPU::tear_down() {
@@ -188,16 +198,16 @@ void VPU::process_pixel() {
     //
     uint8_t color = this->get_pixel_color();
     switch((unsigned int)color) {
-        case 0:
+        case 3:
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
             break;
-        case 1:
+        case 2:
             SDL_SetRenderDrawColor(renderer, 86, 86, 86, 0);
             break;
-        case 2:
+        case 1:
             SDL_SetRenderDrawColor(renderer, 172, 172, 172, 0);
             break;
-        case 3:
+        case 0:
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
             break;
         default:
@@ -252,7 +262,7 @@ uint16_t VPU::get_tile_data_address(uint8_t tile_number) {
     //if ( (unsigned int)this->VRAM_TILE_DATA_TABLES[mode]) != 0x8800) {
 //    if (tile_number)
 //        std::cout << std::hex << (unsigned int)this->VRAM_TILE_DATA_TABLES[mode] << std::endl;
-    return (uint16_t)(((uint16_t)offset << 4) + this->VRAM_TILE_DATA_TABLES[mode]);
+    return (uint16_t)(((uint16_t)offset * 16) + this->VRAM_TILE_DATA_TABLES[mode]);
 }
 
 uint16_t VPU::get_current_map_address() {
