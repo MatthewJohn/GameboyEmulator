@@ -8,7 +8,7 @@
 // #include <string.h>
 #include <memory>
 
-#define DEBUG 1
+#define DEBUG 0
 
 VPU::VPU(RAM *ram) {
     Helper::init();
@@ -112,7 +112,7 @@ void VPU::tick() {
         return;
 
     // If not at end of screen, in either x or y, process pixel
-    if (current_y <= this->SCREEN_HEIGHT && this->get_current_x() <= this->SCREEN_WIDTH)
+    if (current_y <= this->SCREEN_HEIGHT && this->get_current_x() < this->SCREEN_WIDTH)
         this->process_pixel();
 }
 
@@ -153,16 +153,15 @@ uint8_t VPU::get_pixel_color() {
     // Unset last bit of address to get lower byte
     byte_addr &= (uint16_t)0xfffe;
 
-    //
-    unsigned int byte_index = (7 - (pos.x % (this->TILE_WIDTH)));
-    //std::cout << std::hex << pos.x << std::endl;
-//    if (this->get_current_tile_data_address() != 0x8800)
-//        std::cout << std::hex << (unsigned int)this->get_current_tile_data_address() << std::endl;
-    //uint8_t colour_byte = (this->ram->get_val(byte_addr) >> byte_addr);
+    // Get bit index of bytes, by getting the reverse order
+    unsigned int byte_index = (7 - pos.x);
+    // Obtain upper and lower bytes
     uint8_t byte1 = this->ram->get_val(byte_addr);
     uint8_t byte2 = this->ram->get_val(byte_addr | (uint16_t)0x0001);
-    uint8_t colour_byte = ((uint8_t)((byte1 >> byte_index) & (uint8_t)(0x01)) |
-                           (uint8_t)((byte2 >> byte_index) & (uint8_t)(0x01) << 1));
+
+    // Get nth (byte_index) bit from both bytes and use one as lsb and second as msb
+    uint8_t colour_byte = ((uint8_t)((byte2 >> byte_index) & (uint8_t)(0x01)) |
+                           (uint8_t)((byte1 >> byte_index) & (uint8_t)(0x01) << 1));
     
     if (DEBUG && (unsigned int)this->get_current_tile_data_address() != 0x8000) {
         std::cout << std::hex << "byte1: " << (unsigned int)byte1 << " byte2: " << (unsigned int)byte2 << std::endl;
@@ -198,17 +197,17 @@ void VPU::process_pixel() {
     //
     uint8_t color = this->get_pixel_color();
     switch((unsigned int)color) {
-        case 3:
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-            break;
-        case 2:
-            SDL_SetRenderDrawColor(renderer, 86, 86, 86, 0);
+        case 0:
+            SDL_SetRenderDrawColor(renderer, 200, 200, 200, 0);
             break;
         case 1:
             SDL_SetRenderDrawColor(renderer, 172, 172, 172, 0);
             break;
-        case 0:
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+        case 3:
+            SDL_SetRenderDrawColor(renderer, 86, 86, 86, 0);
+            break;
+        case 2:
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
             break;
         default:
             // Random colour

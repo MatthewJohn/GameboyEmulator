@@ -9,10 +9,10 @@
 
 #define DEBUG 0
 #define INTERUPT_DEBUG 1
-#define STEPIN 0xfc
+#define STEPIN 0
 //x98
 #define STOP_ON_BAD_OPCODE 1
-#define STOP_BEFORE_ROM 1
+#define STOP_BEFORE_ROM 0
 
 CPU::CPU(RAM *ram, VPU *vpu_inst) {
     
