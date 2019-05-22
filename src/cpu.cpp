@@ -889,6 +889,8 @@ void CPU::op_Load_Inc(reg8 *dest, combined_reg *source) {
 void CPU::op_Bit(reg8 *comp, unsigned int bit) {
     // Set flags accordinly before operation
     this->set_zero_flag(this->get_register_bit(comp, bit));
+    this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
+    this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 1U);
 }
 
 // Set single bit in a given register
