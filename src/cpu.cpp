@@ -9,7 +9,7 @@
 
 #define DEBUG 0
 #define INTERUPT_DEBUG 1
-#define STEPIN 0xfe
+#define STEPIN 0x98
 #define STOP_ON_BAD_OPCODE 1
 #define STOP_BEFORE_ROM 1
 
@@ -1170,7 +1170,7 @@ void CPU::op_Swap(reg8 *dest) {
 void CPU::op_RL(reg8 *src) {
     // Shift old value left 1 bit into a 16-bit register
     this->data_conv.bit16[0] = src->value << 1 | this->get_carry_flag();
-    src->value = this->data_conv.bit8[1];
+    src->value = this->data_conv.bit8[0];
     this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, (unsigned int)(this->data_conv.bit8[1] & 0x01));
     this->set_zero_flag(src->value);
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);

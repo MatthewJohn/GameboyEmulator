@@ -39,8 +39,8 @@ public:
             uint16_t bit16[1];
         } data_conv;
         data_conv.bit16[0] = data;
-        this->upper->value = data_conv.bit8[0];
-        this->lower->value = data_conv.bit8[1];
+        this->upper->value = data_conv.bit8[1];
+        this->lower->value = data_conv.bit8[0];
     };
 };
 

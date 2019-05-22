@@ -202,6 +202,7 @@ void RAM::load_rom(char *rom_path) {
         addr++;
         //std::cout << std::hex << (int)(addr + 255) << " " << (int)ch << " " << (int)this->memory[addr] << std::endl;
     }
-    infile.close();
+    if (DEBUG)
+        infile.close();
     std::cin.get();
 }
