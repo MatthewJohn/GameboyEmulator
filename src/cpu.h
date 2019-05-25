@@ -47,13 +47,13 @@ public:
 class CPU {
 
 public:
-    CPU(RAM *ram, VPU *vpu_inst);
+    explicit CPU(RAM *ram, VPU *vpu_inst);
     virtual ~CPU() {};
 
     void tick();
     bool is_running();
     //void print_state();
-private:
+protected:
     enum INTERUPT_STATE {
         DISABLED,
         PENDING_DISABLE,
@@ -113,6 +113,7 @@ private:
     program_counter r_pc;
 
     uint8_t get_inc_pc_val8();
+    signed int get_inc_pc_val8s();
     uint16_t get_inc_pc_val16();
     uint16_t get_register_value16(combined_reg *dest);
     void set_register_bit(reg8 *source, uint8_t bit_shift, unsigned int val);
@@ -139,6 +140,7 @@ private:
     void op_Load(uint16_t dest_addr, reg16 *source);
     void op_Load(reg8 *dest, reg8 *source);
     void op_Load(combined_reg *dest);
+    void op_Load(combined_reg *dest, uint16_t val);
     void op_Load(int dest_addr, reg8 *source);
     void op_Load(int dest_addr, uint8_t val);
     void op_Load(reg8 *dest, int source_addr);
@@ -148,9 +150,11 @@ private:
     void op_Add(reg16 *dest);
     void op_Add(reg8 *dest, reg8 *src);
     void op_Add(reg8 *dest, uint16_t src);
+    void op_Add(combined_reg *dest, signed int src);
     void op_Add(combined_reg *dest, combined_reg *src);
     void op_Add(combined_reg *dest, reg16 *src);
     void op_Add(combined_reg *dest, uint32_t src);
+    void op_Add(reg16 *dest, signed int val);
     void op_Sub();
     void op_Sub(reg8 *src);
     void op_Sub(uint16_t src);
@@ -158,8 +162,12 @@ private:
     void op_SBC(uint8_t src);
     
     void op_Inc(reg8 *dest);
+    void op_Inc(uint16_t mem_addr);
+    uint8_t op_Inc(uint8_t val);
     void op_Inc(combined_reg *dest);
     void op_Dec(reg8 *dest);
+    void op_Dec(uint16_t mem_addr);
+    uint8_t op_Dec(uint8_t val);
     void op_Dec(reg16 *dest);
     void op_Dec(combined_reg *dest);
 
@@ -176,6 +184,10 @@ private:
     void op_RL(uint16_t mem_addr);
     void op_RR(reg8 *src);
     void op_RR(uint16_t mem_addr);
+    void op_RLC(reg8* src);
+    void op_RLC(uint16_t mem_addr);
+    void op_RRC(reg8* src);
+    void op_RRC(uint16_t mem_addr);
 
     void op_Call();
     void op_Return();

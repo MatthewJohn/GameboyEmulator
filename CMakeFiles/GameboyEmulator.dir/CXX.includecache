@@ -52,6 +52,12 @@ ram.h
 ./vpu.h
 /home/matthew/w/g/gameboy-emulator/src/./vpu.h
 
+/home/matthew/w/g/gameboy-emulator/src/helper.cpp
+iostream
+-
+helper.h
+/home/matthew/w/g/gameboy-emulator/src/helper.h
+
 /home/matthew/w/g/gameboy-emulator/src/helper.h
 iostream
 -

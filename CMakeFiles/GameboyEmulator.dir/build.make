@@ -105,9 +105,33 @@ CMakeFiles/GameboyEmulator.dir/src/cpu.cpp.o.provides: CMakeFiles/GameboyEmulato
 CMakeFiles/GameboyEmulator.dir/src/cpu.cpp.o.provides.build: CMakeFiles/GameboyEmulator.dir/src/cpu.cpp.o
 
 
+CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o: CMakeFiles/GameboyEmulator.dir/flags.make
+CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o: src/helper.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o -c /home/matthew/w/g/gameboy-emulator/src/helper.cpp
+
+CMakeFiles/GameboyEmulator.dir/src/helper.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/GameboyEmulator.dir/src/helper.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matthew/w/g/gameboy-emulator/src/helper.cpp > CMakeFiles/GameboyEmulator.dir/src/helper.cpp.i
+
+CMakeFiles/GameboyEmulator.dir/src/helper.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/GameboyEmulator.dir/src/helper.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matthew/w/g/gameboy-emulator/src/helper.cpp -o CMakeFiles/GameboyEmulator.dir/src/helper.cpp.s
+
+CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o.requires:
+
+.PHONY : CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o.requires
+
+CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o.provides: CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o.requires
+	$(MAKE) -f CMakeFiles/GameboyEmulator.dir/build.make CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o.provides.build
+.PHONY : CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o.provides
+
+CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o.provides.build: CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o
+
+
 CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o: CMakeFiles/GameboyEmulator.dir/flags.make
 CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o: src/ram.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o -c /home/matthew/w/g/gameboy-emulator/src/ram.cpp
 
 CMakeFiles/GameboyEmulator.dir/src/ram.cpp.i: cmake_force
@@ -131,7 +155,7 @@ CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o.provides.build: CMakeFiles/GameboyE
 
 CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o: CMakeFiles/GameboyEmulator.dir/flags.make
 CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o: src/ram_subset.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o -c /home/matthew/w/g/gameboy-emulator/src/ram_subset.cpp
 
 CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.i: cmake_force
@@ -153,9 +177,33 @@ CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o.provides: CMakeFiles/Gameboy
 CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o.provides.build: CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o
 
 
+CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o: CMakeFiles/GameboyEmulator.dir/flags.make
+CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o: src/run_tests.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o -c /home/matthew/w/g/gameboy-emulator/src/run_tests.cpp
+
+CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/matthew/w/g/gameboy-emulator/src/run_tests.cpp > CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.i
+
+CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/matthew/w/g/gameboy-emulator/src/run_tests.cpp -o CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.s
+
+CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o.requires:
+
+.PHONY : CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o.requires
+
+CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o.provides: CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o.requires
+	$(MAKE) -f CMakeFiles/GameboyEmulator.dir/build.make CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o.provides.build
+.PHONY : CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o.provides
+
+CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o.provides.build: CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o
+
+
 CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o: CMakeFiles/GameboyEmulator.dir/flags.make
 CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o: src/vpu.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o -c /home/matthew/w/g/gameboy-emulator/src/vpu.cpp
 
 CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.i: cmake_force
@@ -181,8 +229,10 @@ CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o.provides.build: CMakeFiles/GameboyE
 GameboyEmulator_OBJECTS = \
 "CMakeFiles/GameboyEmulator.dir/src/Main.cpp.o" \
 "CMakeFiles/GameboyEmulator.dir/src/cpu.cpp.o" \
+"CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o" \
 "CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o" \
 "CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o" \
+"CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o" \
 "CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o"
 
 # External object files for target GameboyEmulator
@@ -190,12 +240,14 @@ GameboyEmulator_EXTERNAL_OBJECTS =
 
 GameboyEmulator: CMakeFiles/GameboyEmulator.dir/src/Main.cpp.o
 GameboyEmulator: CMakeFiles/GameboyEmulator.dir/src/cpu.cpp.o
+GameboyEmulator: CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o
 GameboyEmulator: CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o
 GameboyEmulator: CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o
+GameboyEmulator: CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o
 GameboyEmulator: CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o
 GameboyEmulator: CMakeFiles/GameboyEmulator.dir/build.make
 GameboyEmulator: CMakeFiles/GameboyEmulator.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable GameboyEmulator"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/matthew/w/g/gameboy-emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable GameboyEmulator"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/GameboyEmulator.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -205,8 +257,10 @@ CMakeFiles/GameboyEmulator.dir/build: GameboyEmulator
 
 CMakeFiles/GameboyEmulator.dir/requires: CMakeFiles/GameboyEmulator.dir/src/Main.cpp.o.requires
 CMakeFiles/GameboyEmulator.dir/requires: CMakeFiles/GameboyEmulator.dir/src/cpu.cpp.o.requires
+CMakeFiles/GameboyEmulator.dir/requires: CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o.requires
 CMakeFiles/GameboyEmulator.dir/requires: CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o.requires
 CMakeFiles/GameboyEmulator.dir/requires: CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o.requires
+CMakeFiles/GameboyEmulator.dir/requires: CMakeFiles/GameboyEmulator.dir/src/run_tests.cpp.o.requires
 CMakeFiles/GameboyEmulator.dir/requires: CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o.requires
 
 .PHONY : CMakeFiles/GameboyEmulator.dir/requires

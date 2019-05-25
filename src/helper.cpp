@@ -1,3 +1,5 @@
+#ifdef HELPER_INCLUDED
+#define HELPER_INCLUDED
 #include <iostream>
 #include "helper.h"
 
@@ -8,3 +10,4 @@ void Helper::reset_cout() {
 void Helper::init() {
     Helper::RESET_FLAGS = std::cout.flags();
 }
+#endif

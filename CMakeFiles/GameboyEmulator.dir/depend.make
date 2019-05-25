@@ -101,6 +101,9 @@ CMakeFiles/GameboyEmulator.dir/src/cpu.cpp.o: /usr/include/SDL2/SDL_video.h
 CMakeFiles/GameboyEmulator.dir/src/cpu.cpp.o: /usr/include/SDL2/begin_code.h
 CMakeFiles/GameboyEmulator.dir/src/cpu.cpp.o: /usr/include/SDL2/close_code.h
 
+CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o: src/helper.cpp
+CMakeFiles/GameboyEmulator.dir/src/helper.cpp.o: src/helper.h
+
 CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o: src/helper.h
 CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o: src/ram.cpp
 CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o: src/ram.h
@@ -108,6 +111,7 @@ CMakeFiles/GameboyEmulator.dir/src/ram.cpp.o: src/ram_subset.h
 
 CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o: src/ram_subset.cpp
 CMakeFiles/GameboyEmulator.dir/src/ram_subset.cpp.o: src/ram_subset.h
+
 
 CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o: src/helper.h
 CMakeFiles/GameboyEmulator.dir/src/vpu.cpp.o: src/ram.h
