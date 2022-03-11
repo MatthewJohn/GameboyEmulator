@@ -26,7 +26,7 @@
 //#define STEPIN 0x0101
 //#define STEPIN 0x07f2
 //#define STEPIN 0x00//x0217//x075b
-#define STEPIN 0x100
+#define STEPIN 0x00//0x100
 
 //#define STEPIN 0 //0x06ef //0x0271 //0x029d
 #define DEBUG_POINT 0//xc4a0//x02b7//x086f//x086f//x0870
