@@ -2127,20 +2127,12 @@ void CPU::set_half_carry_sub(uint8_t original_val, uint8_t input) {
         //(test < 0xf0) ? 1U : 0U);
         ((((int)original_val & 0xF) - ((int)input & 0xF)) < 0) ? 1U : 0U);
 }
-void CPU::set_half_carry_sub2(uint16_t original_val, uint16_t input) {
-    // @TODO Check this implimentation
-    // Create Test-bed, which sets up half-byte (lower half-byte) of data.
-    // Remove original value and determine if the uppper nibble of data is affected.
-    uint16_t test = 0xfff0 | original_val;
-    test -= (input & 0x000f);
+void CPU::set_half_carry_sub2(uint8_t original_val, uint8_t input) {
     this->set_register_bit(
         &this->r_f,
         this->HALF_CARRY_FLAG_BIT,
-        // Check if the top 3 nibbles of test value have been changed.
-        // If they have, a borrow has occured. Set register based on this.
-        // If a borrow has occured, set to 0, else 1 
-        ((test & 0xfff0) != 0xfff0) ? 1U : 0U);
-        //((((int)original_val & 0xF) - ((int)input & 0xF)) < 0) ? 1U : 0U);
+        ((input & 0x0f) > (original_val & 0x0f)) ? 1 : 0
+    );
 }
 void CPU::set_half_carry_sub16(uint16_t original_val, uint16_t input) {
     // @TODO Check this implimentation
@@ -2454,7 +2446,7 @@ void CPU::op_Sub(reg8 *src) {
 void CPU::opm_Sub(uint16_t mem_addr) {
     this->op_Sub(this->ram->get_val(mem_addr));
 }
-void CPU::op_Sub(uint16_t src) {
+void CPU::op_Sub(uint8_t src) {
     uint8_t original_val = this->r_a.get_value();
     //std::cout << std::hex << "subtracting " << (int)src << " from " << (int)this->r_a.get_value() << std::endl;
 
@@ -2466,10 +2458,6 @@ void CPU::op_Sub(uint16_t src) {
     this->r_a.set_value(this->data_conv.bit8[0]);
 
     this->set_zero_flag(this->r_a.get_value());
-//    if (src > 0x00ff)
-//        this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 1U);
-//    else
-        uint16_t orig16 = original_val & 0x00ff;
 
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 1U);
 
@@ -2479,7 +2467,7 @@ void CPU::op_Sub(uint16_t src) {
     // Use sub half_carry method and
     // reverse logic in setting carry flag
     // TESTED USING 09-op r,r.gb
-    this->set_half_carry_sub2(orig16, src);
+    this->set_half_carry_sub2(original_val, src);
     this->set_register_bit(
         &this->r_f, this->CARRY_FLAG_BIT,
         ((original_val < src) ? 1U : 0U));
@@ -2527,7 +2515,7 @@ void CPU::op_SBC()
 void CPU::opm_SBC(uint16_t mem_addr)
 {
     // Subtract src plus carry flag
-    this->op_Sub((uint16_t)(this->ram->get_val(mem_addr) + this->get_carry_flag()));
+    this->op_Sub((uint8_t)(this->ram->get_val(mem_addr) + this->get_carry_flag()));
     //this->flip_carry_flag();
     //this->flip_half_carry_flag();
 }

@@ -165,7 +165,7 @@ protected:
     void set_half_carry16(uint16_t original_val, uint16_t input);
     void set_half_carry_sub(uint8_t original_val, uint8_t input);
     void set_half_carry_sub16(uint16_t original_val, uint16_t input);
-    void set_half_carry_sub2(uint16_t original_val, uint16_t input);
+    void set_half_carry_sub2(uint8_t original_val, uint8_t input);
     uint8_t get_carry_flag();
     uint8_t get_half_carry_flag();
     uint8_t get_subtract_flag();
@@ -196,7 +196,7 @@ protected:
     void op_Sub();
     void op_Sub(reg8 *src);
     void opm_Sub(uint16_t mem_addr);
-    void op_Sub(uint16_t src);
+    void op_Sub(uint8_t src);
     void op_SBC(reg8 *src);
     void op_SBC();
     void opm_SBC(uint16_t mem_addr);
