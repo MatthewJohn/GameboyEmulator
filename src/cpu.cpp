@@ -391,7 +391,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Add(&this->r_hl, &this->r_bc);
             break;
         case 0x0a:
-            this->opm_Load(&this->r_a, this->get_register_value16(&this->r_bc));
+            this->opm_Load(&this->r_a, this->r_bc.value());
             break;
         case 0x0b:
             this->op_Dec(&this->r_bc);
@@ -443,7 +443,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Add(&this->r_hl, &this->r_de);
             break;
         case 0x1a:
-            this->opm_Load(&this->r_a, this->get_register_value16(&this->r_de));
+            this->opm_Load(&this->r_a, this->r_de.value());
             break;
         case 0x1b:
             this->op_Dec(&this->r_de);
@@ -540,13 +540,13 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Inc(&this->r_sp);
             break;
         case 0x34:
-            this->opm_Inc(this->get_register_value16(&this->r_hl));
+            this->opm_Inc(this->r_hl.value());
             break;
         case 0x35:
-            this->opm_Dec(this->get_register_value16(&this->r_hl));
+            this->opm_Dec(this->r_hl.value());
             break;
         case 0x36:
-            this->opm_Load(this->get_register_value16(&this->r_hl));
+            this->opm_Load(this->r_hl.value());
             break;
         case 0x37:
             this->op_SCF();
@@ -600,7 +600,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Load(&this->r_b, &this->r_l);
             break;
         case 0x46:
-            this->opm_Load(&this->r_b, this->get_register_value16(&this->r_hl));
+            this->opm_Load(&this->r_b, this->r_hl.value());
             break;
         case 0x47:
             this->op_Load(&this->r_b, &this->r_a);
@@ -624,7 +624,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Load(&this->r_c, &this->r_l);
             break;
         case 0x4e:
-            this->opm_Load(&this->r_c, this->get_register_value16(&this->r_hl));
+            this->opm_Load(&this->r_c, this->r_hl.value());
             break;
         case 0x4f:
             this->op_Load(&this->r_c, &this->r_a);
@@ -648,7 +648,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Load(&this->r_d, &this->r_l);
             break;
         case 0x56:
-            this->opm_Load(&this->r_d, this->get_register_value16(&this->r_hl));
+            this->opm_Load(&this->r_d, this->r_hl.value());
             break;
         case 0x57:
             this->op_Load(&this->r_d, &this->r_a);
@@ -672,7 +672,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Load(&this->r_e, &this->r_l);
             break;
         case 0x5e:
-            this->opm_Load(&this->r_e, this->get_register_value16(&this->r_hl));
+            this->opm_Load(&this->r_e, this->r_hl.value());
             break;
         case 0x5f:
             this->op_Load(&this->r_e, &this->r_a);
@@ -696,7 +696,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Load(&this->r_h, &this->r_l);
             break;
         case 0x66:
-            this->opm_Load(&this->r_h, this->get_register_value16(&this->r_hl));
+            this->opm_Load(&this->r_h, this->r_hl.value());
             break;
         case 0x67:
             this->op_Load(&this->r_h, &this->r_a);
@@ -720,34 +720,34 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Load(&this->r_l, &this->r_l);
             break;
         case 0x6e:
-            this->opm_Load(&this->r_l, this->get_register_value16(&this->r_hl));
+            this->opm_Load(&this->r_l, this->r_hl.value());
             break;
         case 0x6f:
             this->op_Load(&this->r_l, &this->r_a);
             break;
         case 0x70:
-            this->opm_Load(this->get_register_value16(&this->r_hl), &this->r_b);
+            this->opm_Load(this->r_hl.value(), &this->r_b);
             break;
         case 0x71:
-            this->opm_Load(this->get_register_value16(&this->r_hl), &this->r_c);
+            this->opm_Load(this->r_hl.value(), &this->r_c);
             break;
         case 0x72:
-            this->opm_Load(this->get_register_value16(&this->r_hl), &this->r_d);
+            this->opm_Load(this->r_hl.value(), &this->r_d);
             break;
         case 0x73:
-            this->opm_Load(this->get_register_value16(&this->r_hl), &this->r_e);
+            this->opm_Load(this->r_hl.value(), &this->r_e);
             break;
         case 0x74:
-            this->opm_Load(this->get_register_value16(&this->r_hl), &this->r_h);
+            this->opm_Load(this->r_hl.value(), &this->r_h);
             break;
         case 0x75:
-            this->opm_Load(this->get_register_value16(&this->r_hl), &this->r_l);
+            this->opm_Load(this->r_hl.value(), &this->r_l);
             break;
         case 0x76:
             this->op_Halt();
             break;
         case 0x77:
-            this->opm_Load(this->get_register_value16(&this->r_hl), &this->r_a);
+            this->opm_Load(this->r_hl.value(), &this->r_a);
             break;
         case 0x78:
             this->op_Load(&this->r_a, &this->r_b);
@@ -768,7 +768,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Load(&this->r_a, &this->r_l);
             break;
         case 0x7e:
-            this->opm_Load(&this->r_a, this->get_register_value16(&this->r_hl));
+            this->opm_Load(&this->r_a, this->r_hl.value());
             break;
         case 0x7f:
             this->op_Load(&this->r_a, &this->r_a);
@@ -792,7 +792,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Add(&this->r_a, &this->r_l);
             break;
         case 0x86:
-            this->opm_Add(&this->r_a, this->get_register_value16(&this->r_hl));
+            this->opm_Add(&this->r_a, this->r_hl.value());
             break;
         case 0x87:
             this->op_Add(&this->r_a, &this->r_a);
@@ -816,7 +816,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Adc(&this->r_a, &this->r_l);
             break;
         case 0x8e:
-            this->opm_Adc(&this->r_a, this->get_register_value16(&this->r_hl));
+            this->opm_Adc(&this->r_a, this->r_hl.value());
             break;
         case 0x8f:
             this->op_Adc(&this->r_a, &this->r_a);
@@ -840,7 +840,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Sub(&this->r_l);
             break;
         case 0x96:
-            this->opm_Sub(this->get_register_value16(&this->r_hl));
+            this->opm_Sub(this->r_hl.value());
             break;
         case 0x97:
             this->op_Sub(&this->r_a);
@@ -867,7 +867,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_SBC(&this->r_l);
             break;
         case 0x9e:
-            this->opm_SBC(this->get_register_value16(&this->r_hl));
+            this->opm_SBC(this->r_hl.value());
             break;
         case 0x9f:
             this->op_SBC(&this->r_a);
@@ -891,7 +891,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_AND(&this->r_l);
             break;
         case 0xa6:
-            this->opm_AND(this->get_register_value16(&this->r_hl));
+            this->opm_AND(this->r_hl.value());
             break;
         case 0xa7:
             this->op_AND(&this->r_a);
@@ -915,7 +915,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_XOR(&this->r_l);
             break;
         case 0xae:
-            this->opm_XOR(this->get_register_value16(&this->r_hl));
+            this->opm_XOR(this->r_hl.value());
             break;
         case 0xaf:
             // X-OR A with A into A
@@ -940,7 +940,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_OR(&this->r_l);
             break;
         case 0xb6:
-            this->opm_OR(this->get_register_value16(&this->r_hl));
+            this->opm_OR(this->r_hl.value());
             break;
         case 0xb7:
             this->op_OR(&this->r_a);
@@ -1216,7 +1216,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_RLC(&this->r_l);
             break;
         case 0x06:
-            this->opm_RLC(this->get_register_value16(&this->r_hl));
+            this->opm_RLC(this->r_hl.value());
             break;
         case 0x07:
             this->op_RLC(&this->r_a);
@@ -1240,7 +1240,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_RRC(&this->r_l);
             break;
         case 0x0e:
-            this->opm_RRC(this->get_register_value16(&this->r_hl));
+            this->opm_RRC(this->r_hl.value());
             break;
         case 0x0f:
             this->op_RRC(&this->r_a);
@@ -1264,7 +1264,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_RL(&this->r_l);
             break;
         case 0x16:
-            this->opm_RL(this->get_register_value16(&this->r_hl));
+            this->opm_RL(this->r_hl.value());
             break;
         case 0x17:
             this->op_RL(&this->r_a);
@@ -1288,7 +1288,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_RR(&this->r_l);
             break;
         case 0x1e:
-            this->opm_RR(this->get_register_value16(&this->r_hl));
+            this->opm_RR(this->r_hl.value());
             break;
         case 0x1f:
             this->op_RR(&this->r_a);
@@ -1312,7 +1312,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_SLA(&this->r_l);
             break;
         case 0x26:
-            this->opm_SLA(this->get_register_value16(&this->r_hl));
+            this->opm_SLA(this->r_hl.value());
             break;
         case 0x27:
             this->op_SLA(&this->r_a);
@@ -1336,7 +1336,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_SRA(&this->r_l);
             break;
         case 0x2e:
-            this->opm_SRA(this->get_register_value16(&this->r_hl));
+            this->opm_SRA(this->r_hl.value());
             break;
         case 0x2f:
             this->op_SRA(&this->r_a);
@@ -1361,7 +1361,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Swap(&this->r_l);
             break;
         case 0x36:
-            this->opm_Swap(this->get_register_value16(&this->r_hl));
+            this->opm_Swap(this->r_hl.value());
             break;
         case 0x37:
             this->op_Swap(&this->r_a);
@@ -1385,7 +1385,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_SRL(&this->r_l);
             break;
         case 0x3e:
-            this->opm_SRL(this->get_register_value16(&this->r_hl));
+            this->opm_SRL(this->r_hl.value());
             break;
         case 0x3f:
             this->op_SRL(&this->r_a);
@@ -1409,7 +1409,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Bit(0, &this->r_l);
             break;
         case 0x46:
-            this->opm_Bit(0, this->get_register_value16(&this->r_hl));
+            this->opm_Bit(0, this->r_hl.value());
             break;
         case 0x47:
             this->op_Bit(0, &this->r_a);
@@ -1433,7 +1433,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Bit(1, &this->r_l);
             break;
         case 0x4e:
-            this->opm_Bit(1, this->get_register_value16(&this->r_hl));
+            this->opm_Bit(1, this->r_hl.value());
             break;
         case 0x4f:
             this->op_Bit(1, &this->r_a);
@@ -1457,7 +1457,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Bit(2, &this->r_l);
             break;
         case 0x56:
-            this->opm_Bit(2, this->get_register_value16(&this->r_hl));
+            this->opm_Bit(2, this->r_hl.value());
             break;
         case 0x57:
             this->op_Bit(2, &this->r_a);
@@ -1481,7 +1481,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Bit(3, &this->r_l);
             break;
         case 0x5e:
-            this->opm_Bit(3, this->get_register_value16(&this->r_hl));
+            this->opm_Bit(3, this->r_hl.value());
             break;
         case 0x5f:
             this->op_Bit(3, &this->r_a);
@@ -1505,7 +1505,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Bit(4, &this->r_l);
             break;
         case 0x66:
-            this->opm_Bit(4, this->get_register_value16(&this->r_hl));
+            this->opm_Bit(4, this->r_hl.value());
             break;
         case 0x67:
             this->op_Bit(4, &this->r_a);
@@ -1529,7 +1529,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Bit(5, &this->r_l);
             break;
         case 0x6e:
-            this->opm_Bit(5, this->get_register_value16(&this->r_hl));
+            this->opm_Bit(5, this->r_hl.value());
             break;
         case 0x6f:
             this->op_Bit(5, &this->r_a);
@@ -1553,7 +1553,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Bit(6, &this->r_l);
             break;
         case 0x76:
-            this->opm_Bit(6, this->get_register_value16(&this->r_hl));
+            this->opm_Bit(6, this->r_hl.value());
             break;
         case 0x77:
             this->op_Bit(6, &this->r_a);
@@ -1577,7 +1577,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Bit(7, &this->r_l);
             break;
         case 0x7e:
-            this->opm_Bit(7, this->get_register_value16(&this->r_hl));
+            this->opm_Bit(7, this->r_hl.value());
             break;
         case 0x7f:
             this->op_Bit(7, &this->r_a);
@@ -1601,7 +1601,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Res(0, &this->r_l);
             break;
         case 0x86:
-            this->opm_Res(0, this->get_register_value16(&this->r_hl));
+            this->opm_Res(0, this->r_hl.value());
             break;
         case 0x87:
             this->op_Res(0, &this->r_a);
@@ -1625,7 +1625,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Res(1, &this->r_l);
             break;
         case 0x8e:
-            this->opm_Res(1, this->get_register_value16(&this->r_hl));
+            this->opm_Res(1, this->r_hl.value());
             break;
         case 0x8f:
             this->op_Res(1, &this->r_a);
@@ -1649,7 +1649,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Res(2, &this->r_l);
             break;
         case 0x96:
-            this->opm_Res(2, this->get_register_value16(&this->r_hl));
+            this->opm_Res(2, this->r_hl.value());
             break;
         case 0x97:
             this->op_Res(2, &this->r_a);
@@ -1673,7 +1673,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Res(3, &this->r_l);
             break;
         case 0x9e:
-            this->opm_Res(3, this->get_register_value16(&this->r_hl));
+            this->opm_Res(3, this->r_hl.value());
             break;
         case 0x9f:
             this->op_Res(3, &this->r_a);
@@ -1697,7 +1697,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Res(4, &this->r_l);
             break;
         case 0xa6:
-            this->opm_Res(4, this->get_register_value16(&this->r_hl));
+            this->opm_Res(4, this->r_hl.value());
             break;
         case 0xa7:
             this->op_Res(4, &this->r_a);
@@ -1721,7 +1721,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Res(5, &this->r_l);
             break;
         case 0xae:
-            this->opm_Res(5, this->get_register_value16(&this->r_hl));
+            this->opm_Res(5, this->r_hl.value());
             break;
         case 0xaf:
             this->op_Res(5, &this->r_a);
@@ -1745,7 +1745,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Res(6, &this->r_l);
             break;
         case 0xb6:
-            this->opm_Res(6, this->get_register_value16(&this->r_hl));
+            this->opm_Res(6, this->r_hl.value());
             break;
         case 0xb7:
             this->op_Res(6, &this->r_a);
@@ -1769,7 +1769,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Res(7, &this->r_l);
             break;
         case 0xbe:
-            this->opm_Res(7, this->get_register_value16(&this->r_hl));
+            this->opm_Res(7, this->r_hl.value());
             break;
         case 0xbf:
             this->op_Res(7, &this->r_a);
@@ -1793,7 +1793,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Set(0, &this->r_l);
             break;
         case 0xc6:
-            this->opm_Set(0, this->get_register_value16(&this->r_hl));
+            this->opm_Set(0, this->r_hl.value());
             break;
         case 0xc7:
             this->op_Set(0, &this->r_a);
@@ -1817,7 +1817,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Set(1, &this->r_l);
             break;
         case 0xce:
-            this->opm_Set(1, this->get_register_value16(&this->r_hl));
+            this->opm_Set(1, this->r_hl.value());
             break;
         case 0xcf:
             this->op_Set(1, &this->r_a);
@@ -1841,7 +1841,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Set(2, &this->r_l);
             break;
         case 0xd6:
-            this->opm_Set(2, this->get_register_value16(&this->r_hl));
+            this->opm_Set(2, this->r_hl.value());
             break;
         case 0xd7:
             this->op_Set(2, &this->r_a);
@@ -1865,7 +1865,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Set(3, &this->r_l);
             break;
         case 0xde:
-            this->opm_Set(3, this->get_register_value16(&this->r_hl));
+            this->opm_Set(3, this->r_hl.value());
             break;
         case 0xdf:
             this->op_Set(3, &this->r_a);
@@ -1889,7 +1889,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Set(4, &this->r_l);
             break;
         case 0xe6:
-            this->opm_Set(4, this->get_register_value16(&this->r_hl));
+            this->opm_Set(4, this->r_hl.value());
             break;
         case 0xe7:
             this->op_Set(4, &this->r_a);
@@ -1913,7 +1913,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Set(5, &this->r_l);
             break;
         case 0xee:
-            this->opm_Set(5, this->get_register_value16(&this->r_hl));
+            this->opm_Set(5, this->r_hl.value());
             break;
         case 0xef:
             this->op_Set(5, &this->r_a);
@@ -1937,7 +1937,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Set(6, &this->r_l);
             break;
         case 0xf6:
-            this->opm_Set(6, this->get_register_value16(&this->r_hl));
+            this->opm_Set(6, this->r_hl.value());
             break;
         case 0xf7:
             this->op_Set(6, &this->r_a);
@@ -1961,7 +1961,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             this->op_Set(7, &this->r_l);
             break;
         case 0xfe:
-            this->opm_Set(7, this->get_register_value16(&this->r_hl));
+            this->opm_Set(7, this->r_hl.value());
             break;
         case 0xff:
             this->op_Set(7, &this->r_a);
@@ -1978,16 +1978,6 @@ void CPU::execute_cb_code(unsigned int op_val) {
     }
 }
 
-uint16_t CPU::get_register_value16(combined_reg *dest) {
-    union {
-        uint8_t bit8[2];
-        uint16_t bit16[1];
-    } data_conv;
-    data_conv.bit8[0] = dest->lower->get_value();
-    data_conv.bit8[1] = dest->upper->get_value();
-
-    return data_conv.bit16[0];
-}
 
 // Perform XOR of registry against A and then store
 // result in A
