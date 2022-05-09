@@ -54,6 +54,26 @@ signed int convert_signed_uint8_to_signed_int(uint8_t orig)
         return (int)orig;
 }
 
+uint8_t reg8::get_value() {
+    return this->value;
+}
+uint8_t& reg8::get_pointer() {
+    return this->value;
+}
+void reg8::set_value(uint8_t new_value) {
+    this->value = new_value;
+}
+
+uint16_t reg16::get_value() {
+    return this->value;
+}
+uint16_t& reg16::get_pointer() {
+    return this->value;
+}
+void reg16::set_value(uint16_t new_value) {
+    this->value = new_value;
+}
+
 
 CPU::CPU(RAM *ram, VPU *vpu_inst)
 {
@@ -87,14 +107,14 @@ CPU::CPU(RAM *ram, VPU *vpu_inst)
 
 void CPU::reset_state()
 {
-    this->r_a.value = 0;
-    this->r_f.value = 0;
-    this->r_b.value = 0;
-    this->r_c.value = 0;
-    this->r_d.value = 0;
-    this->r_e.value = 0;
-    this->r_h.value = 0;
-    this->r_l.value = 0;
+    this->r_a.set_value(0);
+    this->r_f.set_value(0);
+    this->r_b.set_value(0);
+    this->r_c.set_value(0);
+    this->r_d.set_value(0);
+    this->r_e.set_value(0);
+    this->r_h.set_value(0);
+    this->r_l.set_value(0);
 
     this->h_blank_executed = false;
     this->v_blank_executed = false;
@@ -105,8 +125,8 @@ void CPU::reset_state()
     this->interupt_state = this->INTERUPT_STATE::DISABLED;
     this->halt_state = false;
 
-    this->r_sp.value = 0xfffe;
-    this->r_pc.value = 0x00;
+    this->r_sp.set_value(0xfffe);
+    this->r_pc.set_value(0x00);
 
     this->checked_op_codes_itx = 0;
     this->checked_cb_codes_itx = 0;
@@ -123,7 +143,7 @@ bool CPU::is_running() {
 void CPU::tick() {
     this->tick_counter ++;
     if (DEBUG_EVERY != 1 && this->tick_counter % DEBUG_EVERY == 0)
-        std::cout << this->tick_counter << " Tick: " << std::hex << this->r_pc.value << ", SP: " << this->r_sp.value << std::endl;
+        std::cout << this->tick_counter << " Tick: " << std::hex << this->r_pc.get_value() << ", SP: " << this->r_sp.get_value() << std::endl;
         //this->running = false;
     if (STEPIN_AFTER && (! this->stepped_in) && this->tick_counter >= STEPIN_AFTER)
         this->stepped_in = true;
@@ -132,8 +152,8 @@ void CPU::tick() {
         if (! this->stepped_in) {
             this->print_state_m();
         }
-        std::cout << std::endl << std::endl << "New Tick: " << std::hex << this->r_pc.value << ", SP: " << this->r_sp.value << std::endl;
-    } else if (DEBUG_POINT && this->r_pc.value == DEBUG_POINT)
+        std::cout << std::endl << std::endl << "New Tick: " << std::hex << this->r_pc.get_value() << ", SP: " << this->r_sp.get_value() << std::endl;
+    } else if (DEBUG_POINT && this->r_pc.get_value() == DEBUG_POINT)
     {
         this->print_state_m();
         std::cin.get();
@@ -158,8 +178,8 @@ void CPU::tick() {
         return;
 
     // Determine stepped-in before PC is incremented
-    if ((STEPIN == 1 || (STEPIN + 1) == this->r_pc.value ||
-        STEPIN == this->r_pc.value) && STEPIN != 0)
+    if ((STEPIN == 1 || (STEPIN + 1) == this->r_pc.get_value() ||
+        STEPIN == this->r_pc.get_value()) && STEPIN != 0)
     {
         std::cout << std::hex << (unsigned int)this->ram->get_val((uint16_t)0x8010) <<
                                  (unsigned int)this->ram->get_val(0x8011) <<
@@ -181,7 +201,7 @@ void CPU::tick() {
     }
 
     // Stop runnign when we hit the start of the ROM
-    unsigned int current_pc = (unsigned int)this->r_pc.value;
+    unsigned int current_pc = (unsigned int)this->r_pc.get_value();
     if ((current_pc == 0x0100) && STOP_BEFORE_ROM) {
         this->running = false;
         std::cout << "HIT the start of the ROM!" << std::endl;
@@ -198,13 +218,13 @@ void CPU::debug_op_codes(unsigned int op_val)
     {
         this->checked_op_codes[this->checked_op_codes_itx] = op_val;
         this->checked_op_codes_itx ++;
-        if (this->ram->boot_rom_swapped || this->r_pc.value > 0x100)
+        if (this->ram->boot_rom_swapped || this->r_pc.get_value() > 0x100)
             this->debug_opcode = true;
     } else if (this->cb_state && (! (std::find(std::begin(this->checked_cb_codes), std::end(this->checked_cb_codes), op_val) != std::end(this->checked_cb_codes))))
     {
         this->checked_cb_codes[this->checked_cb_codes_itx] = op_val;
         this->checked_cb_codes_itx ++;
-        if (this->ram->boot_rom_swapped || this->r_pc.value > 0x100)
+        if (this->ram->boot_rom_swapped || this->r_pc.get_value() > 0x100)
             this->debug_opcode = true;
     }
     //this->debug_opcode = false;
@@ -272,8 +292,8 @@ void CPU::print_state_m() {
         //"h : " << std::setfill('0') << std::setw(2) << (unsigned int)this->r_h.value << std::endl <<
         //" l: " << std::setfill('0') << std::setw(2) << (unsigned int)this->r_l.value << std::endl <<
         "hl: " << std::setfill('0') << std::setw(4) << this->r_hl.value() << std::endl <<
-        "sp: " << std::setfill('0') << std::setw(4) << this->r_sp.value << std::endl <<
-        "pc: " << std::setfill('0') << std::setw(4) << this->r_pc.value << std::endl;
+        "sp: " << std::setfill('0') << std::setw(4) << this->r_sp.get_value() << std::endl <<
+        "pc: " << std::setfill('0') << std::setw(4) << this->r_pc.get_value() << std::endl;
 }
 
 void CPU::check_interupts() {
@@ -283,12 +303,12 @@ void CPU::check_interupts() {
         if (! this->v_blank_executed)
         {
             if (true || INTERUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << std::hex << "Got v-blank interupt at: " << (unsigned int)this->r_pc.value << std::endl;
+                std::cout << std::hex << "Got v-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
 
             // Store PC on the stack
-            this->ram->stack_push(this->r_sp.value, this->r_pc.value);
+            this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
             // Jump to 0x0040
-            this->r_pc.value = (uint8_t)0x0040;
+            this->r_pc.set_value((uint8_t)0x0040);
             
             // Mark interupt for h_blank as being executed
             this->v_blank_executed = true;
@@ -307,10 +327,10 @@ void CPU::check_interupts() {
         if (! this->h_blank_executed)
         {
             if (true || INTERUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << std::hex << "Got h-blank interupt at: " << (unsigned int)this->r_pc.value << std::endl;
+                std::cout << std::hex << "Got h-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
 
             // Do a straight jump to 0x0048
-            this->r_pc.value = (uint8_t)0x0048;
+            this->r_pc.set_value((uint8_t)0x0048);
         
             // Mark interupt for h_blank as being executed
             this->h_blank_executed = true;
@@ -327,8 +347,8 @@ void CPU::check_interupts() {
 
     if (this->timer_overflow)
     {
-        this->ram->stack_push(this->r_sp.value, this->r_pc.value);
-        this->r_pc.value = this->ram->get_val(this->TIMER_INTERUPT_PTR_ADDR);
+        this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
+        this->r_pc.set_value(this->ram->get_val(this->TIMER_INTERUPT_PTR_ADDR));
         return;
     }
 }
@@ -339,7 +359,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             // STOP
             //this->op_Noop();
             if (DEBUG || this->stepped_in)
-                std::cout << "Noop: " << std::hex << this->r_pc.value << std::endl;
+                std::cout << "Noop: " << std::hex << this->r_pc.get_value() << std::endl;
             break;
         case 0x01:
             this->op_Load(&this->r_bc);
@@ -1086,7 +1106,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Pop(&this->r_hl);
             break;
         case 0xe2:
-            this->opm_Load((uint16_t)((uint16_t)0xff00 + this->r_c.value), &this->r_a);
+            this->opm_Load((uint16_t)((uint16_t)0xff00 + this->r_c.get_value()), &this->r_a);
             break;
         case 0xe5:
             this->op_Push(&this->r_hl);
@@ -1119,10 +1139,10 @@ void CPU::execute_op_code(unsigned int op_val) {
         case 0xf1:
             this->op_Pop(&this->r_af);
             // Purge anything in the LSB nibble of the flag
-            this->r_f.value = (this->r_f.value & 0xf0);
+            this->r_f.set_value(this->r_f.get_value() & 0xf0);
             break;
         case 0xf2:
-            this->opm_Load(&this->r_a, (uint16_t)(0xff00 + this->r_c.value));
+            this->opm_Load(&this->r_a, (uint16_t)(0xff00 + this->r_c.get_value()));
             break;
         case 0xf3:
             // Disable interupts
@@ -1138,7 +1158,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_RST(0x0030);
             break;
         case 0xf8:
-            this->op_Load(&this->r_hl, (uint16_t)(this->r_sp.value + this->get_inc_pc_val8s()));
+            this->op_Load(&this->r_hl, (uint16_t)(this->r_sp.get_value() + this->get_inc_pc_val8s()));
             // Special OP, set registers after load
             this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, 0U);
             this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
@@ -1164,7 +1184,7 @@ void CPU::execute_op_code(unsigned int op_val) {
             break;
 
         default:
-            std::cout << std::hex << ((unsigned int)this->r_pc.value - 1) << "Unknown op code: 0x";
+            std::cout << std::hex << ((unsigned int)this->r_pc.get_value() - 1) << "Unknown op code: 0x";
             std::cout << std::setfill('0') << std::setw(2) << std::hex << op_val;
             std::cout << std::endl;
             if (STOP_ON_BAD_OPCODE) {
@@ -1963,8 +1983,8 @@ uint16_t CPU::get_register_value16(combined_reg *dest) {
         uint8_t bit8[2];
         uint16_t bit16[1];
     } data_conv;
-    data_conv.bit8[0] = dest->lower->value;
-    data_conv.bit8[1] = dest->upper->value;
+    data_conv.bit8[0] = dest->lower->get_value();
+    data_conv.bit8[1] = dest->upper->get_value();
 
     return data_conv.bit16[0];
 }
@@ -1975,15 +1995,15 @@ void CPU::opm_XOR(uint16_t mem_addr) {
     this->op_XOR(this->ram->get_val(mem_addr));
 }
 void CPU::op_XOR(reg8 *comp) {
-    this->op_XOR(comp->value);
+    this->op_XOR(comp->get_value());
 
 }
 void CPU::op_XOR(uint8_t val) {
-    this->r_a.value = this->r_a.value ^ val;
+    this->r_a.set_value(this->r_a.get_value() ^ val);
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, 0U);
-    this->set_zero_flag(this->r_a.value);
+    this->set_zero_flag(this->r_a.get_value());
 }
 
 // AND operators - And with the A register value, set result to A
@@ -1992,15 +2012,15 @@ void CPU::op_AND() {
     this->op_AND(comp);
 }
 void CPU::op_AND(reg8 *comp) {
-    this->op_AND(comp->value);
+    this->op_AND(comp->get_value());
 }
 void CPU::opm_AND(uint16_t mem_addr)
 {
     this->op_AND(this->ram->get_val(mem_addr));
 }
 void CPU::op_AND(uint8_t comp) {
-    this->r_a.value = this->r_a.value & comp;
-    this->set_zero_flag(this->r_a.value);
+    this->r_a.set_value(this->r_a.get_value() & comp);
+    this->set_zero_flag(this->r_a.get_value());
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 1U);
     this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, 0U);
@@ -2011,15 +2031,15 @@ void CPU::op_OR() {
     this->op_OR(this->get_inc_pc_val8());
 }
 void CPU::op_OR(reg8 *comp) {
-    this->op_OR(comp->value);
+    this->op_OR(comp->get_value());
 }
 void CPU::opm_OR(uint16_t mem_addr)
 {
     this->op_OR(this->ram->get_val(mem_addr));
 }
 void CPU::op_OR(uint8_t comp) {
-    uint8_t res = this->r_a.value | comp;
-    this->r_a.value = res;
+    uint8_t res = this->r_a.get_value() | comp;
+    this->r_a.set_value(res);
     this->set_zero_flag(res);
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
@@ -2030,18 +2050,18 @@ void CPU::op_OR(uint8_t comp) {
 void CPU::set_register_bit(reg8 *source, uint8_t bit_shift, unsigned int val) {
     if (val == 1)
         // OR the register with bit shifted 1
-        source->value |= (1 << bit_shift);
+        source->set_value(source->get_value() | (1 << bit_shift));
     else
         // XOR 0xff with bit to be unset.
         // AND register with this value, meaning only
         // specified bit is masked.
-        source->value &= (0xff ^ (1 << bit_shift));
+        source->set_value(source->get_value() & (0xff ^ (1 << bit_shift)));
 }
 
 // Obtain the value of a given bit of a given register
 uint8_t CPU::get_register_bit(reg8 *source, unsigned int bit_shift) {
     // Bit shift 1 by bit to retrieve and AND with register value.
-    return ((source->value & (1  << bit_shift)) >> bit_shift);
+    return ((source->get_value() & (1  << bit_shift)) >> bit_shift);
 }
 
 // Set zero flag, based on the value of a given register
@@ -2135,12 +2155,12 @@ void CPU::set_half_carry_sub16(uint16_t original_val, uint16_t input) {
 // Get value from memory at PC and increment PC
 uint8_t CPU::get_inc_pc_val8()
 {
-    uint8_t ori_val = this->ram->get_val(this->r_pc.value);
+    uint8_t ori_val = this->ram->get_val(this->r_pc.get_value());
     if (DEBUG || this->stepped_in)
-        std::cout << "Got PC value from RAM: " << std::hex << (unsigned int)ori_val << " at " << (unsigned int)this->r_pc.value << std::endl;
+        std::cout << "Got PC value from RAM: " << std::hex << (unsigned int)ori_val << " at " << (unsigned int)this->r_pc.get_value() << std::endl;
     uint8_t val;
     memcpy(&val, &ori_val, 1);
-    this->r_pc.value ++;
+    this->r_pc.set_value(this->r_pc.get_value() + 1);
     return val;
 }
 
@@ -2192,7 +2212,7 @@ void CPU::op_Load_Inc(reg8 *dest, combined_reg *source) {
 
 void CPU::op_CPL()
 {
-    this->r_a.value = (this->r_a.value ^ 0xff);
+    this->r_a.set_value(this->r_a.get_value() ^ 0xff);
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 1U);
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 1U);
 }
@@ -2236,12 +2256,12 @@ void CPU::opm_Set(uint8_t bit, uint16_t mem_addr) {
 void CPU::op_DAA()
 {
     uint8_t diff = 0x00;
-    if (this->get_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT) || (this->r_a.value & 0x0f) > 0x09)
+    if (this->get_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT) || (this->r_a.get_value() & 0x0f) > 0x09)
     {
         diff |= (uint8_t)0x06;
     }
 
-    if (this->get_register_bit(&this->r_f, this->CARRY_FLAG_BIT) || (this->r_a.value & 0xf0) > 0x90)
+    if (this->get_register_bit(&this->r_f, this->CARRY_FLAG_BIT) || (this->r_a.get_value() & 0xf0) > 0x90)
     {
         diff |= (uint8_t)0x60;
     }
@@ -2256,7 +2276,7 @@ void CPU::op_DAA()
 
     this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, ((diff == 0x66) ? 1U : 0U));
         
-    this->set_zero_flag(this->r_a.value);
+    this->set_zero_flag(this->r_a.get_value());
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
 }
 
@@ -2266,7 +2286,7 @@ void CPU::op_Adc(reg8 *dest) {
     this->op_Adc(dest, source);
 }
 void CPU::op_Adc(reg8 *dest, reg8 *source) {
-    this->op_Adc(dest, source->value);
+    this->op_Adc(dest, source->get_value());
 }
 void CPU::opm_Adc(reg8 *dest, uint16_t mem_addr) {
     this->op_Adc(dest, this->ram->get_val(mem_addr));
@@ -2274,15 +2294,15 @@ void CPU::opm_Adc(reg8 *dest, uint16_t mem_addr) {
 void CPU::op_Adc(reg8 *dest, uint8_t source) {
 
     // Always work with r_a
-    uint8_t original_val = dest->value;
+    uint8_t original_val = dest->get_value();
     this->data_conv.bit16[0] = 0;
-    this->data_conv.bit8[0] = dest->value;
+    this->data_conv.bit8[0] = dest->get_value();
     this->data_conv.bit16[0] += source;
     this->data_conv.bit16[0] += this->get_carry_flag();
-    dest->value = this->data_conv.bit8[0];
+    dest->set_value(this->data_conv.bit8[0]);
 
     // Set zero flag
-    this->set_zero_flag(dest->value);
+    this->set_zero_flag(dest->get_value());
 
     // Set subtract flag to 0
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
@@ -2305,7 +2325,7 @@ void CPU::op_Adc(reg8 *dest, uint8_t source) {
 
 ////////////////////////// Load OPs //////////////////////////
 void CPU::op_Load(reg8 *dest) {
-    dest->value = this->get_inc_pc_val8();
+    dest->set_value(this->get_inc_pc_val8());
 }
 // Load next byte into provided address
 void CPU::opm_Load(uint16_t dest) {
@@ -2313,36 +2333,36 @@ void CPU::opm_Load(uint16_t dest) {
     this->opm_Load(dest, val);
 }
 void CPU::op_Load(combined_reg *dest) {
-    dest->lower->value = this->get_inc_pc_val8();
-    dest->upper->value = this->get_inc_pc_val8();
+    dest->lower->set_value(this->get_inc_pc_val8());
+    dest->upper->set_value(this->get_inc_pc_val8());
 }
 void CPU::op_Load(reg16 *dest) {
-    dest->value = this->get_inc_pc_val16();
+    dest->set_value(this->get_inc_pc_val16());
 
 }
 void CPU::opm_Load(uint16_t dest_addr, reg16 *source) {
-    this->ram->set(dest_addr, source->value);
+    this->ram->set(dest_addr, source->get_value());
 }
 // Copy 1 byte between registers
 void CPU::op_Load(reg8 *dest, reg8 *source) {
-    mempcpy(&dest->value, &source->value, 1);
+    dest->set_value(source->get_value());
 }
 // Copy register value into destination address of memory
 void CPU::opm_Load(uint16_t dest_addr, reg8 *source) {
-    this->opm_Load(dest_addr, source->value);
+    this->opm_Load(dest_addr, source->get_value());
 }
 void CPU::opm_Load(uint16_t dest_addr, uint8_t val) {
     this->ram->set(dest_addr, val);
 }
 // Copy data from source memory address to destination
 void CPU::opm_Load(reg8 *dest, uint16_t source_addr) {
-    dest->value = this->ram->get_val(source_addr);
+    dest->set_value(this->ram->get_val(source_addr));
 }
 void CPU::op_Load(combined_reg *dest, uint16_t val) {
     dest->set_value(val);
 }
 void CPU::op_Load(reg16 *dest, combined_reg *src) {
-    dest->value = src->value();
+    dest->set_value(src->value());
 }
 
 
@@ -2352,15 +2372,15 @@ void CPU::op_Add(reg8 *dest) {
     this->op_Add(dest, source);
 }
 void CPU::op_Add(reg8 *dest, reg8 *src) {
-    this->op_Add(dest, (uint16_t)(src->value | 0x0000));
+    this->op_Add(dest, (uint16_t)(src->get_value() | 0x0000));
 }
 void CPU::opm_Add(reg8 *dest, uint16_t mem_addr) {
     this->op_Add(dest, (uint16_t)(this->ram->get_val(mem_addr) | 0x0000));
 }
 inline void CPU::op_Add(reg8 *dest, uint16_t src) {
-    uint8_t original_val = dest->value;
+    uint8_t original_val = dest->get_value();
 
-    this->data_conv.bit8[0] = dest->value;
+    this->data_conv.bit8[0] = dest->get_value();
     this->data_conv.bit8[1] = 0;
 
     this->data_conv.bit16[0] += src;
@@ -2368,7 +2388,7 @@ inline void CPU::op_Add(reg8 *dest, uint16_t src) {
 
     this->set_zero_flag(this->data_conv.bit8[0]);
     this->set_half_carry(original_val, (uint8_t)src);
-    dest->value = this->data_conv.bit8[0];
+    dest->set_value(this->data_conv.bit8[0]);
 
     // Set subtract flag to 0, since this is add
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
@@ -2382,7 +2402,7 @@ void CPU::op_Add(combined_reg *dest, combined_reg *src) {
     this->op_Add(dest, (uint32_t)src->value());
 }
 void CPU::op_Add(combined_reg *dest, reg16 *src) {
-    this->op_Add(dest, (uint32_t)src->value);
+    this->op_Add(dest, (uint32_t)src->get_value());
 }
 inline void CPU::op_Add(combined_reg *dest, uint32_t src) {
     uint16_t original_val = dest->value();
@@ -2392,8 +2412,8 @@ inline void CPU::op_Add(combined_reg *dest, uint32_t src) {
 
     this->data_conv32.bit32[0] += src;
 
-    dest->lower->value = this->data_conv32.bit8[0];
-    dest->upper->value = this->data_conv32.bit8[1];
+    dest->lower->set_value(this->data_conv32.bit8[0]);
+    dest->upper->set_value(this->data_conv32.bit8[1]);
 
     // @TODO: Ensure that the carry still works with a signed value!
     this->set_half_carry16(original_val, (uint16_t)src);
@@ -2407,21 +2427,21 @@ inline void CPU::op_Add(combined_reg *dest, uint32_t src) {
 
 void CPU::op_Add(reg16 *dest, unsigned int val) {
     // Add to value of dest
-    uint32_t res = (unsigned int)(0x00000000 | dest->value) + (signed int)val;
+    uint32_t res = (unsigned int)(0x00000000 | dest->get_value()) + (signed int)val;
     // Reset subtract/zero flags
     this->set_zero_flag(0x00);
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
     this->set_register_bit(
         &this->r_f, this->CARRY_FLAG_BIT,
         (0x00010000 & res) >> 16);
-    this->set_half_carry16(dest->value, val);
-    dest->value = res & 0x0000ffff;
+    this->set_half_carry16(dest->get_value(), val);
+    dest->set_value((uint8_t)(res & 0x0000ffff));
 }
 void CPU::op_Add(reg16 *dest) {
     // Get byte from next byte, treat as signed 8-bit value
     int8_t source = this->get_inc_pc_val8();
     // Add to value of dest
-    dest->value += source;
+    dest->set_value(dest->get_value() + source);
 }
 
 void CPU::op_Sub() {
@@ -2429,23 +2449,23 @@ void CPU::op_Sub() {
     this->op_Sub(source);
 }
 void CPU::op_Sub(reg8 *src) {
-    this->op_Sub((uint16_t)src->value & 0x00ff);
+    this->op_Sub((uint16_t)src->get_value() & 0x00ff);
 }
 void CPU::opm_Sub(uint16_t mem_addr) {
     this->op_Sub(this->ram->get_val(mem_addr));
 }
 void CPU::op_Sub(uint16_t src) {
-    uint8_t original_val = this->r_a.value;
-    //std::cout << std::hex << "subtracting " << (int)src << " from " << (int)this->r_a.value << std::endl;
+    uint8_t original_val = this->r_a.get_value();
+    //std::cout << std::hex << "subtracting " << (int)src << " from " << (int)this->r_a.get_value() << std::endl;
 
-    this->data_conv.bit8[0] = this->r_a.value;
+    this->data_conv.bit8[0] = this->r_a.get_value();
     this->data_conv.bit8[1] = 0;
 
     this->data_conv.bit16[0] -= src;
 
-    this->r_a.value = this->data_conv.bit8[0];
+    this->r_a.set_value(this->data_conv.bit8[0]);
 
-    this->set_zero_flag(this->r_a.value);
+    this->set_zero_flag(this->r_a.get_value());
 //    if (src > 0x00ff)
 //        this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 1U);
 //    else
@@ -2476,7 +2496,7 @@ void CPU::op_Sub(uint16_t src) {
 
     std::cout << std::hex << "value to remove: " << (unsigned int)src << std::endl;
 
-    std::cout << std::hex << "output value: " << (unsigned int)this->r_a.value << std::endl;
+    std::cout << std::hex << "output value: " << (unsigned int)this->r_a.get_value() << std::endl;
     std::cout << std::hex << "carry: " << (unsigned int)this->get_carry_flag() << std::endl;
     std::cout << std::hex << "hary-carry: " << (unsigned int)this->get_half_carry_flag() << std::endl;
     std::cout << std::hex << "zero: " << (unsigned int)this->get_zero_flag() << std::endl;
@@ -2488,7 +2508,7 @@ void CPU::op_SBC(reg8 *src)
 {
     // Subtract src plus carry flag
     // @TODO Confirm if the addition is performed as an 8 bit or 16 bit value, (e.g. 0xff + carry flag = 0x100 or 0x00)
-    uint16_t value_to_sub = (uint16_t)src->value + this->get_carry_flag();
+    uint16_t value_to_sub = (uint16_t)src->get_value() + this->get_carry_flag();
     this->op_Sub(value_to_sub);
     // @TODO confirm if flip should not be performed
     //this->flip_carry_flag();
@@ -2515,7 +2535,7 @@ void CPU::opm_SBC(uint16_t mem_addr)
 void CPU::op_Inc(reg8 *src)
 {
     // Calls op_Inc(uint8_t)
-    src->value = this->op_Inc(src->value);
+    src->set_value(this->op_Inc(src->get_value()));
 }
 void CPU::opm_Inc(uint16_t mem_addr)
 {
@@ -2553,36 +2573,36 @@ void CPU::op_Inc(combined_reg *dest) {
         uint32_t bit32[1];
     } data_conv;
 
-    data_conv.bit8[0] = dest->lower->value;
-    data_conv.bit8[1] = dest->upper->value;
+    data_conv.bit8[0] = dest->lower->get_value();
+    data_conv.bit8[1] = dest->upper->get_value();
     data_conv.bit32[0] = (uint32_t)((unsigned int)(data_conv.bit32[0]) + 1);
-    dest->lower->value = data_conv.bit8[0];
-    dest->upper->value = data_conv.bit8[1];
+    dest->lower->set_value(data_conv.bit8[0]);
+    dest->upper->set_value(data_conv.bit8[1]);
     //std::cout << "BUNNNNN" << std::endl;
 }
 void CPU::op_Inc(reg16 *dest) {
     //std::cout << "RUNNNNN" << std::endl;
-    this->data_conv32.bit16[0] = dest->value;
+    this->data_conv32.bit16[0] = dest->get_value();
     this->data_conv32.bit16[1] = 0;
     this->data_conv32.bit32[0] = (uint32_t)((unsigned int)(this->data_conv32.bit32[0]) + 1);
-    dest->value = this->data_conv32.bit16[0];
+    dest->set_value(this->data_conv32.bit16[0]);
 }
 void CPU::op_Dec(reg16 *dest) {
-    this->data_conv32.bit16[0] = dest->value;
+    this->data_conv32.bit16[0] = dest->get_value();
     this->data_conv32.bit16[1] = 0;
     this->data_conv32.bit32[0] = (uint32_t)((unsigned int)(this->data_conv32.bit32[0]) - 1);
-    dest->value = this->data_conv32.bit16[0];
+    dest->set_value(this->data_conv32.bit16[0]);
 }
 void CPU::op_Dec(combined_reg *dest) {
     this->data_conv32.bit16[0] = dest->value();
     this->data_conv32.bit16[1] = 0;
     this->data_conv32.bit32[0] = (uint32_t)((int)(this->data_conv32.bit32[0]) - 1);
-    dest->lower->value = this->data_conv32.bit8[0];
-    dest->upper->value = this->data_conv32.bit8[1];
+    dest->lower->set_value(this->data_conv32.bit8[0]);
+    dest->upper->set_value(this->data_conv32.bit8[1]);
 }
 void CPU::op_Dec(reg8 *src)
 {
-    src->value = this->op_Dec(src->value);
+    src->set_value(this->op_Dec(src->get_value()));
 }
 void CPU::opm_Dec(uint16_t mem_addr)
 {
@@ -2611,7 +2631,7 @@ void CPU::op_CP() {
     this->op_CP(this->get_inc_pc_val8());
 }
 void CPU::op_CP(reg8 *in) {
-    this->op_CP(in->value);
+    this->op_CP(in->get_value());
 }
 void CPU::opm_CP(uint16_t mem_addr) {
     this->op_CP(this->ram->get_val(mem_addr));
@@ -2620,12 +2640,12 @@ void CPU::opm_CP(uint16_t mem_addr) {
 void CPU::op_CP(uint8_t in) {
 
     // Set zero flag based on the result of comparison
-    this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, (this->r_a.value == in) ? 1U : 0U);
+    this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, (this->r_a.get_value() == in) ? 1U : 0U);
 
     // Always set subtract flag (since that is what we're doing!)
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 1U);
-    this->set_half_carry_sub(this->r_a.value, in);
-    this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, ((unsigned int)this->r_a.value < (unsigned int)in) ? 1U : 0U);
+    this->set_half_carry_sub(this->r_a.get_value(), in);
+    this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, ((unsigned int)this->r_a.get_value() < (unsigned int)in) ? 1U : 0U);
 }
 
 void CPU::opm_Swap(uint16_t mem_addr)
@@ -2640,11 +2660,11 @@ void CPU::opm_Swap(uint16_t mem_addr)
 }
 void CPU::op_Swap(reg8 *dest)
 {
-    dest->value = ((dest->value & 0x0F) << 4) | ((dest->value & 0xF0) >> 4);
+    dest->set_value(((dest->get_value() & 0x0F) << 4) | ((dest->get_value() & 0xF0) >> 4));
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, 0U);
-    this->set_zero_flag(dest->value);
+    this->set_zero_flag(dest->get_value());
 }
 
 void CPU::opm_SRL(uint16_t mem_addr)
@@ -2670,22 +2690,22 @@ void CPU::opm_SRL(uint16_t mem_addr)
 void CPU::op_SRL(reg8 *src)
 {
     // Get LSB from value, to set as carry flag
-    uint8_t carry_bit = src->value & (0x01);
+    uint8_t carry_bit = src->get_value() & (0x01);
 
     // Shift bits right and force MSB to 0
-    src->value = ((src->value >> 1) & (uint8_t)0x7F);
+    src->set_value(((src->get_value() >> 1) & (uint8_t)0x7F));
 
     // Put pushed bit into carry flag
     this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, carry_bit);
     // Update zero flag
-    this->set_zero_flag(src->value);
+    this->set_zero_flag(src->get_value());
     // Reset subtract and half-carry bits
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
 }
 
 void CPU::op_SLA(reg8 *src) {
-    src->value = this->op_SLA(src->value);
+    src->set_value(this->op_SLA(src->get_value()));
 }
 void CPU::opm_SLA(uint16_t mem_addr) {
     this->ram->set(mem_addr, this->op_SLA(this->ram->get_val(mem_addr)));
@@ -2700,7 +2720,7 @@ uint8_t CPU::op_SLA(uint8_t val) {
 }
 
 void CPU::op_SRA(reg8 *src) {
-    src->value = this->op_SRA(src->value);
+    src->set_value(this->op_SRA(src->get_value()));
 }
 void CPU::opm_SRA(uint16_t mem_addr) {
     this->ram->set(mem_addr, this->op_SRA(this->ram->get_val(mem_addr)));
@@ -2717,12 +2737,12 @@ uint8_t CPU::op_SRA(uint8_t val) {
 void CPU::op_RL(reg8 *src) {
     // Shift old value left 1 bit into a 16-bit register
     this->data_conv.bit16[0] = 0x0000;
-    this->data_conv.bit16[0] = ((uint16_t)src->value << 1) | (this->get_carry_flag() & 0x01);
-    src->value = this->data_conv.bit8[0];
+    this->data_conv.bit16[0] = ((uint16_t)src->get_value() << 1) | (this->get_carry_flag() & 0x01);
+    src->set_value(this->data_conv.bit8[0]);
     this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, (this->data_conv.bit8[1] & 0x01));
     // If not RLA, set zero flag
     if (this->cb_state)
-        this->set_zero_flag(src->value);
+        this->set_zero_flag(src->get_value());
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
 }
@@ -2740,14 +2760,14 @@ void CPU::opm_RL(uint16_t mem_addr) {
 
 void CPU::op_RR(reg8 *src) {
     // Capture carry bit from LSB
-    uint8_t carry_bit = src->value & (0x01);
+    uint8_t carry_bit = src->get_value() & (0x01);
     // Shift old value right 1 bit, setting MSB to original carry flag
-    src->value = (((src->value >> 1) & 0x7f) | ((this->get_carry_flag() << 7) & 0x80));
+    src->set_value((((src->get_value() >> 1) & 0x7f) | ((this->get_carry_flag() << 7) & 0x80)));
     this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, carry_bit);
 
     // If not RRA, set zero flag
     if (this->cb_state)
-        this->set_zero_flag(src->value);
+        this->set_zero_flag(src->get_value());
 
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
@@ -2768,12 +2788,12 @@ void CPU::opm_RR(uint16_t mem_addr) {
 void CPU::op_RLC(reg8* src)
 {
     // Shit to left 1 bit, storing original bit 7 into bit 0
-    src->value = ((((src->value & 0x80) >> 7) & 0x01) | ((src->value << 1) & 0xfe));
+    src->set_value(((((src->get_value() & 0x80) >> 7) & 0x01) | ((src->get_value() << 1) & 0xfe)));
     // Store bit 0 (what was bit 7, into carry flag
-    this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, (src->value & 0x01));
+    this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, (src->get_value() & 0x01));
     // If not RLCA, set zero flag
     if (this->cb_state)
-        this->set_zero_flag(src->value);
+        this->set_zero_flag(src->get_value());
     else
         this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
@@ -2798,12 +2818,12 @@ void CPU::opm_RLC(uint16_t mem_addr)
 void CPU::op_RRC(reg8* src)
 {
     // Store bit 0 in carry flag
-    this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, (src->value & 0x01));
+    this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, (src->get_value() & 0x01));
     // Shit to right 1 bit, storing original bit 0 into bit 7
-    src->value = (((src->value & 0x01) << 7) | ((src->value >> 1) & 0x7f));
+    src->set_value(((src->get_value() & 0x01) << 7) | ((src->get_value() >> 1) & 0x7f));
     // If not RRCA, set zero flag
     if (this->cb_state)
-        this->set_zero_flag(src->value);
+        this->set_zero_flag(src->get_value());
     else
         this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
@@ -2842,37 +2862,37 @@ void CPU::op_Call() {
     // Get jump address
     uint16_t jmp_dest_addr = this->get_inc_pc_val16();
     if (DEBUG || this->stepped_in)
-        std::cout << "Jumping from: " << std::hex << this->r_pc.value << " to " << (int)jmp_dest_addr << std::endl;
+        std::cout << "Jumping from: " << std::hex << this->r_pc.get_value() << " to " << (int)jmp_dest_addr << std::endl;
 
     // Push PC (which has already been incremented) to stack
-    this->ram->stack_push(this->r_sp.value, this->r_pc.value);
+    this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
 
     // Set PC to jump destination address
-    this->r_pc.value = jmp_dest_addr;
+    this->r_pc.set_value(jmp_dest_addr);
 }
 
 void CPU::op_Return() {
-    this->r_pc.value = this->ram->stack_pop(this->r_sp.value);
+    this->r_pc.set_value(this->ram->stack_pop(this->r_sp.get_pointer()));
 }
 
 void CPU::op_Push(reg16 *src) {
-    this->op_Push(src->value);
+    this->op_Push(src->get_value());
 }
 void CPU::op_Push(combined_reg *src) {
     this->op_Push(src->value());
 }
 void CPU::op_Push(uint16_t src) {
-    this->ram->stack_push(this->r_sp.value, src);
+    this->ram->stack_push(this->r_sp.get_pointer(), src);
 }
 
 void CPU::op_Pop(reg16 *dest) {
-    dest->value = this->op_Pop();
+    dest->set_value(this->op_Pop());
 }
 void CPU::op_Pop(combined_reg *dest) {
     dest->set_value(this->op_Pop());
 }
 uint16_t CPU::op_Pop() {
-    return this->ram->stack_pop(this->r_sp.value);
+    return this->ram->stack_pop(this->r_sp.get_pointer());
 }
 
 // Jump forward N number instructions
@@ -2881,13 +2901,13 @@ void CPU::op_JR() {
     signed int jp = this->get_inc_pc_val8s();
 
     if (DEBUG || this->stepped_in)
-        std::cout << "Jump from " << std::hex << (int)this->r_pc.value << " by " << (int)jp;
+        std::cout << "Jump from " << std::hex << (int)this->r_pc.get_value() << " by " << (int)jp;
     // @TODO Verify that this jumps by the value AFTER the pc increment
     // for this instruction.
-    this->r_pc.value = (uint16_t)((unsigned int)this->r_pc.value + jp);
+    this->r_pc.set_value((uint16_t)((unsigned int)this->r_pc.get_value() + jp));
     //this->r_pc.value --;
     if (DEBUG || this->stepped_in)
-        std::cout << " to " << std::hex << (int)this->r_pc.value << std::endl;
+        std::cout << " to " << std::hex << (int)this->r_pc.get_value() << std::endl;
 }
 
 // Jump to address
@@ -2901,22 +2921,22 @@ void CPU::op_JP(combined_reg *jmp_reg) {
 }
 void CPU::op_JP(uint16_t jump_to) {
     if (DEBUG || this->stepped_in)
-        std::cout << std::hex << "Jump from " << (int)this->r_pc.value << " to " << (int)jump_to << std::endl;
+        std::cout << std::hex << "Jump from " << (int)this->r_pc.get_value() << " to " << (int)jump_to << std::endl;
     // @TODO Verify that this jumps by the value AFTER the pc increment
     // for this instruction.
-    this->r_pc.value = jump_to;
+    this->r_pc.set_value(jump_to);
 }
 
 void CPU::op_RST(uint16_t memory_addr) {
     // Get jump address
     if (DEBUG || this->stepped_in)
-        std::cout << "Jumping from: " << std::hex << this->r_pc.value << " to " << (int)memory_addr << std::endl;
+        std::cout << "Jumping from: " << std::hex << this->r_pc.get_value() << " to " << (int)memory_addr << std::endl;
 
     // Push PC (which has already been incremented) to stack
-    this->ram->stack_push(this->r_sp.value, this->r_pc.value);
+    this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
 
     // Set PC to jump destination address
-    this->r_pc.value = memory_addr;
+    this->r_pc.set_value(memory_addr);
 }
 
 ////////////////////////// halty-waity-related OPs //////////////////////////

@@ -12,26 +12,34 @@
 // Stub-class for friend
 class TestRunner;
 
-// Any register
-struct reg { };
-
 // 8-bit register
-struct reg8 : reg {
-    uint8_t value;
+class reg8 {
+private:
+   uint8_t value;
+public:
+    uint8_t get_value();
+    uint8_t& get_pointer();
+    void set_value(uint8_t new_value);
 };
+
 // 16-bit register
-struct reg16 : reg {
-    uint16_t value;
+class reg16 {
+private:
+   uint16_t value;
+public:
+    uint16_t get_value();
+    uint16_t& get_pointer();
+    void set_value(uint16_t new_value);
 };
 
 // Accumulator
-struct accumulator : reg8 { };
+class accumulator : public reg8 { };
 // General Register
-struct gen_reg : reg8 { };
+class gen_reg : public reg8 { };
 // Stack pointer
-struct stack_pointer : reg16 { };
+class stack_pointer : public reg16 { };
 // Program counter
-struct program_counter : reg16 { };
+class program_counter : public reg16 { };
 
 class combined_reg {
     // The z80 is little endian because if you were to store HL to memory,
@@ -40,10 +48,10 @@ class combined_reg {
 public:
     reg8 *lower;
     reg8 *upper;
-    uint16_t value() { return ((uint16_t)upper->value << 8) | ((uint16_t)lower->value);};
+    uint16_t value() { return ((uint16_t)upper->get_value() << 8) | ((uint16_t)lower->get_value());};
     void set_value(uint16_t data) {
-        this->upper->value = (data & 0xff00) >> 8;
-        this->lower->value = data & 0x00ff;
+        this->upper->set_value((data & 0xff00) >> 8);
+        this->lower->set_value(data & 0x00ff);
     };
 };
 
