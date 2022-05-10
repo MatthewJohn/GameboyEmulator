@@ -1364,7 +1364,7 @@ uint8_t CPU::execute_op_code(unsigned int op_val) {
             }
             break;
         case 0xdc:
-            if (this->get_carry_flag() != 0x00) {
+            if (this->get_carry_flag() == 0x01) {
                 this->op_Call();
                 t = 24;
             }
@@ -3225,13 +3225,13 @@ void CPU::op_JR() {
     // Default to obtaining value from next byte
     int8_t jp = this->get_inc_pc_val8s();
 
-    if (true || DEBUG || this->stepped_in)
+    if (DEBUG || this->stepped_in)
         std::cout << "Jump from " << std::hex << (unsigned int)this->r_pc.get_value() << " by " << signed(jp);
     // @TODO Verify that this jumps by the value AFTER the pc increment
     // for this instruction.
     this->r_pc.set_value(this->r_pc.get_value() + jp);
     //this->r_pc.value --;
-    if (true || DEBUG || this->stepped_in)
+    if (DEBUG || this->stepped_in)
         std::cout << " to " << std::hex << this->r_pc.get_value() << std::endl;
 }
 
@@ -3245,7 +3245,7 @@ void CPU::op_JP(combined_reg *jmp_reg) {
     this->op_JP(jmp_reg->value());
 }
 void CPU::op_JP(uint16_t jump_to) {
-    if (DEBUG || this->stepped_in)
+    if (true || DEBUG || this->stepped_in)
         std::cout << std::hex << "Jump from " << (int)this->r_pc.get_value() << " to " << (int)jump_to << std::endl;
     // @TODO Verify that this jumps by the value AFTER the pc increment
     // for this instruction.

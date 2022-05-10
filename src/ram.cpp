@@ -11,6 +11,7 @@
 #include "helper.h"
 #include "ram.h"
 #define DEBUG 0
+#define STACK_DEBUG 0
 
 RAM::RAM() {
     // Initialise memory to 0.
@@ -40,7 +41,7 @@ void RAM::stack_push8(uint16_t &sp_val, uint8_t pc_val) {
     // Decrease SP value, then store pc_val into the memory location
     // of sp
     sp_val --;
-    if (DEBUG)
+    if (STACK_DEBUG)
         std::cout << "pushing to stack: " << std::hex << (unsigned int)pc_val << " at " << (int)sp_val << std::endl;
     this->set(sp_val, pc_val);
 }
@@ -50,6 +51,9 @@ void RAM::stack_push(uint16_t &sp_val, uint16_t pc_val) {
         uint16_t bit16[1];
     } data_conv;
     data_conv.bit16[0] = pc_val;
+
+    if (STACK_DEBUG)
+        std::cout << "Jumping from: " << std::hex << (unsigned int)data_conv.bit16[0] << std::endl;
 
     // Write backwards due to little endian, but due to the writing of
     // the stack working backwards, it will write it backwards again,
@@ -64,8 +68,8 @@ void RAM::stack_push(uint16_t &sp_val, uint16_t pc_val) {
 uint8_t RAM::stack_pop8(uint16_t &sp_val) {
     // Obtain value from stack and decrease SP value,
     uint8_t dest = this->get_val(sp_val);
-    if (DEBUG)
-        std::cout << "got: " << std::hex << dest << " from " << (int)sp_val << std::endl;
+    if (STACK_DEBUG)
+        std::cout << "got: " << std::hex << (int)dest << " from " << (int)sp_val << std::endl;
     sp_val ++;
     return dest;
 }
@@ -76,7 +80,7 @@ uint16_t RAM::stack_pop(uint16_t &sp_val) {
     } data_conv;
     data_conv.bit8[0] = this->stack_pop8(sp_val);
     data_conv.bit8[1] = this->stack_pop8(sp_val);
-    if (DEBUG)
+    if (STACK_DEBUG)
         std::cout << "Returning to: " << std::hex << (unsigned int)data_conv.bit16[0] << std::endl;
     return data_conv.bit16[0];
 }
