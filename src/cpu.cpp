@@ -204,7 +204,7 @@ void CPU::tick() {
         return;
     }
 
-    // Read value from memory
+    // Read value from memory, incrementing PC
     this->op_val = (unsigned int)this->get_inc_pc_val8();
 
     //this->debug_op_codes(op_this->val);
