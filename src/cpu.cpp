@@ -2505,13 +2505,9 @@ uint16_t CPU::get_inc_pc_val16()
         uint8_t bit8[2];
         uint16_t bit16[1];
     } data_conv;
-    uint16_t tmp;
 
-    // @TODO: Why is this Not little endian?!
-    tmp = this->get_inc_pc_val8();
-    memcpy(&data_conv.bit8[0], &tmp, 1);
-    tmp = this->get_inc_pc_val8();
-    memcpy(&data_conv.bit8[1], &tmp, 1);
+    data_conv.bit8[0] = this->get_inc_pc_val8();
+    data_conv.bit8[1] = this->get_inc_pc_val8();
     return data_conv.bit16[0];
 }
 
