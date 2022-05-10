@@ -2544,7 +2544,7 @@ uint8_t CPU::op_Inc(uint8_t val) {
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
 
     // Determine half carry flag based on 5th bit of first byte
-    this->set_half_carry(original_val, 0x08);
+    this->set_half_carry(original_val, 0x01);
     return val;
 }
 
