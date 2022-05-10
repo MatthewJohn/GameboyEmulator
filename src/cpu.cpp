@@ -2236,29 +2236,31 @@ void CPU::opm_Set(uint8_t bit, uint16_t mem_addr) {
 
 void CPU::op_DAA()
 {
+    uint8_t original_n_flag = this->get_subtract_flag();
     uint8_t diff = 0x00;
     if (this->get_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT) || (this->r_a.get_value() & 0x0f) > 0x09)
     {
-        diff |= (uint8_t)0x06;
+        diff = 0x06;
     }
 
-    if (this->get_register_bit(&this->r_f, this->CARRY_FLAG_BIT) || (this->r_a.get_value() & 0xf0) > 0x90)
+    if (this->get_register_bit(&this->r_f, this->CARRY_FLAG_BIT) || ((this->r_a.get_value() + diff) & 0xf0) > 0x90)
     {
-        diff |= (uint8_t)0x60;
+        diff += 0x60;
     }
     
-    if ((unsigned int)diff > 0x00)
+    if (diff > 0x00)
     {
-        if (this->get_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT) == (uint8_t)0x01)
+        if (this->get_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT) == 0x01)
             this->op_Sub(diff);
         else
             this->op_Add(&this->r_a, diff);
     }
 
-    this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, ((diff == 0x66) ? 1U : 0U));
+    this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, (((diff & 0x60) == 0x60) ? 1U : 0U));
         
     this->set_zero_flag(this->r_a.get_value());
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
+    this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, original_n_flag);
 }
 
 // Add 8bit PC value and carry flag to A.
