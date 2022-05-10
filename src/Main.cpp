@@ -76,7 +76,7 @@ int main(int argc, char* args[])
     // 10-bit ops.gb - passed
     // 11-op a,(hl).gb - passed
 
-    char rom_path[] = "./resources/test_roms/cpu_instrs/individual/03-op sp,hl.gb";
+    char rom_path[] = "./resources/test_roms/cpu_instrs/individual/07-jr,jp,call,ret,rst.gb";
     //char rom_path[] = "./debug/testrom.gb";
     //char rom_path[] = "./copyright/dmg_test_prog_ver1.gb";
     ram_inst->load_bios(bios_path);

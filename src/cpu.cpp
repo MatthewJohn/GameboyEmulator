@@ -54,6 +54,14 @@ signed int convert_signed_uint8_to_signed_int(uint8_t orig)
         return (int)orig;
 }
 
+int8_t convert_signed_uint8_to_int8(uint8_t orig)
+{
+    if (orig & 0x80)
+        return (int8_t)(0 - ((orig - 1) ^ 0xff));
+    else
+        return (int8_t)orig;
+}
+
 uint8_t reg8::get_value() {
     return this->value;
 }
@@ -334,7 +342,7 @@ void CPU::check_interupts() {
     {
         if (! this->h_blank_executed)
         {
-            if (true || INTERUPT_DEBUG || DEBUG || this->stepped_in)
+            if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
                 std::cout << std::hex << "Got h-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
 
             // Do a straight jump to 0x0048
@@ -2484,9 +2492,9 @@ uint8_t CPU::get_inc_pc_val8()
 }
 
 // Get value from memory at PC, treat as signed and increment PC
-signed int CPU::get_inc_pc_val8s()
+int8_t CPU::get_inc_pc_val8s()
 {
-    return convert_signed_uint8_to_signed_int(this->get_inc_pc_val8());
+    return convert_signed_uint8_to_int8(this->get_inc_pc_val8());
 }
 
 // Get 2-byte value from memory address at PC,
@@ -3219,16 +3227,16 @@ uint16_t CPU::op_Pop() {
 // Jump forward N number instructions
 void CPU::op_JR() {
     // Default to obtaining value from next byte
-    signed int jp = this->get_inc_pc_val8s();
+    int8_t jp = this->get_inc_pc_val8s();
 
-    if (DEBUG || this->stepped_in)
-        std::cout << "Jump from " << std::hex << (int)this->r_pc.get_value() << " by " << (int)jp;
+    if (true || DEBUG || this->stepped_in)
+        std::cout << "Jump from " << std::hex << (unsigned int)this->r_pc.get_value() << " by " << signed(jp);
     // @TODO Verify that this jumps by the value AFTER the pc increment
     // for this instruction.
-    this->r_pc.set_value((uint16_t)((unsigned int)this->r_pc.get_value() + jp));
+    this->r_pc.set_value(this->r_pc.get_value() + jp);
     //this->r_pc.value --;
-    if (DEBUG || this->stepped_in)
-        std::cout << " to " << std::hex << (int)this->r_pc.get_value() << std::endl;
+    if (true || DEBUG || this->stepped_in)
+        std::cout << " to " << std::hex << this->r_pc.get_value() << std::endl;
 }
 
 // Jump to address

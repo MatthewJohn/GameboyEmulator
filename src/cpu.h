@@ -134,7 +134,7 @@ protected:
     program_counter r_pc;
 
     uint8_t get_inc_pc_val8();
-    signed int get_inc_pc_val8s();
+    int8_t get_inc_pc_val8s();
     uint16_t get_inc_pc_val16();
     void set_register_bit(reg8 *source, uint8_t bit_shift, unsigned int val);
     uint8_t get_register_bit(reg8 *source, unsigned int bit_shift);
