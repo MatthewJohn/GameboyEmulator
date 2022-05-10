@@ -198,6 +198,7 @@ protected:
     void op_Sub(uint8_t src);
     void op_SBC(reg8 *src);
     void op_SBC();
+    void op_SBC_common(uint8_t value);
     void opm_SBC(uint16_t mem_addr);
     void op_DAA();
     void op_CPL();

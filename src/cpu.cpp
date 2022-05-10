@@ -458,7 +458,6 @@ void CPU::execute_op_code(unsigned int op_val) {
             this->op_Load(&this->r_e);
             break;
         case 0x1f:
-            // @TODO - DOES THIS SET ZERO FLAG?
             this->op_RR(&this->r_a);
             break;
         case 0x20:
@@ -2468,7 +2467,7 @@ void CPU::op_Sub(uint8_t src) {
 //        this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, 0U);
 //    }
 
-    if (this->op_val == 0x98) {
+    if (this->op_val == 0xde) {
     std::cout << std::endl;
     std::cout << std::hex << "original value: " << (unsigned int)original_val << std::endl;
 
@@ -2484,30 +2483,36 @@ void CPU::op_Sub(uint8_t src) {
 
 void CPU::op_SBC(reg8 *src)
 {
-    // Subtract src plus carry flag
-    // @TODO Confirm if the addition is performed as an 8 bit or 16 bit value, (e.g. 0xff + carry flag = 0x100 or 0x00)
-    uint16_t value_to_sub = (uint16_t)src->get_value() + this->get_carry_flag();
-    this->op_Sub(value_to_sub);
-    // @TODO confirm if flip should not be performed
-    //this->flip_carry_flag();
-    //this->flip_half_carry_flag();
-
+    this->op_SBC_common(src->get_value());
 }
 
 void CPU::op_SBC()
 {
-    // Subtract src plus carry flag
-    this->op_Sub((uint16_t)(this->get_inc_pc_val8() + this->get_carry_flag()));
-    //this->flip_carry_flag();
-    //this->flip_half_carry_flag();
+    this->op_SBC_common(this->get_inc_pc_val8());
 }
 
 void CPU::opm_SBC(uint16_t mem_addr)
 {
     // Subtract src plus carry flag
-    this->op_Sub((uint8_t)(this->ram->get_val(mem_addr) + this->get_carry_flag()));
-    //this->flip_carry_flag();
-    //this->flip_half_carry_flag();
+    this->op_SBC_common(this->ram->get_val(mem_addr));
+}
+
+void CPU::op_SBC_common(uint8_t value)
+{
+    uint16_t combined_value = value + this->get_carry_flag();
+
+    // Calculate half-carry flag using 0x0f of initial value without carry flag, plus carry flag afterwards.
+    uint8_t half_carry_flag = ((value & 0x0f) + this->get_carry_flag()) > (this->r_a.get_value() & 0x0f) ? 1U : 0U;
+
+    // Subtract src plus carry flag
+    this->op_Sub((uint8_t)combined_value);
+    
+    // Handle case where 
+    if (combined_value == 0x0100U)
+        this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, 1U);
+        
+    // Handle SBC-specific carry flag
+    this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, half_carry_flag);
 }
 
 void CPU::op_Inc(reg8 *src)
