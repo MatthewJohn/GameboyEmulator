@@ -142,6 +142,7 @@ bool CPU::is_running() {
 
 void CPU::tick() {
     this->tick_counter ++;
+
     if (DEBUG_EVERY != 1 && this->tick_counter % DEBUG_EVERY == 0)
         std::cout << this->tick_counter << " Tick: " << std::hex << this->r_pc.get_value() << ", SP: " << this->r_sp.get_value() << std::endl;
         //this->running = false;
@@ -188,16 +189,23 @@ void CPU::tick() {
         this->stepped_in = true;
     }
 
+    // If currently in an operation,
+    // decrement the ticks and move on
+    if (this->current_op_ticks > 0x00) {
+        this->current_op_ticks --;
+        return;
+    }
+
     // Read value from memory
     this->op_val = (unsigned int)this->get_inc_pc_val8();
 
     //this->debug_op_codes(op_this->val);
 
     if (this->cb_state) {
-        this->execute_cb_code(this->op_val);
+        this->current_op_ticks = this->execute_cb_code(this->op_val);
         this->cb_state = false;
     } else {
-        this->execute_op_code(this->op_val);
+        this->current_op_ticks = this->execute_op_code(this->op_val);
     }
 
     // Stop runnign when we hit the start of the ROM
@@ -353,808 +361,1092 @@ void CPU::check_interupts() {
     }
 }
 
-void CPU::execute_op_code(unsigned int op_val) {
+uint8_t CPU::execute_op_code(unsigned int op_val) {
+    // number of ticks
+    uint8_t t = 0;
     switch(op_val) {
         case 0x0:
             // STOP
             //this->op_Noop();
             if (DEBUG || this->stepped_in)
                 std::cout << "Noop: " << std::hex << this->r_pc.get_value() << std::endl;
+            t = 4;
             break;
         case 0x01:
             this->op_Load(&this->r_bc);
+            t = 12;
             break;
         case 0x02:
             this->opm_Load(this->r_bc.value(), &this->r_a);
+            t = 8;
             break;
         case 0x03:
             this->op_Inc(&this->r_bc);
+            t = 8;
             break;
         case 0x04:
             this->op_Inc(&this->r_b);
+            t = 4;
             break;
         case 0x05:
             this->op_Dec(&this->r_b);
+            t = 4;
             break;
         case 0x06:
             // Load byte into C
             this->op_Load(&this->r_b);
+            t = 8;
             break;
         case 0x07:
             this->op_RLC(&this->r_a);
+            t = 4;
             break;
         case 0x08:
             // Load byte into C
             this->opm_Load(this->get_inc_pc_val16(), &this->r_sp);
+            t = 20;
             break;
         case 0x09:
             this->op_Add(&this->r_hl, &this->r_bc);
+            t = 8;
             break;
         case 0x0a:
             this->opm_Load(&this->r_a, this->r_bc.value());
+            t = 8;
             break;
         case 0x0b:
             this->op_Dec(&this->r_bc);
+            t = 8;
             break;
         case 0x0c:
             this->op_Inc(&this->r_c);
+            t = 4;
             break;
         case 0x0d:
             this->op_Dec(&this->r_c);
+            t = 4;
             break;
         case 0x0e:
             // Load byte into C
             this->op_Load(&this->r_c);
+            t = 8;
             break;
         case 0x0f:
             this->op_RRC(&this->r_a);
+            t = 4;
             break;
         case 0x10:
             //this->op_Stop();
             // @TODO: This is TEMPORARY
             //this->running = false;
+            t = 4;
             break;
         case 0x11:
             this->op_Load(&this->r_de);
+            t = 12;
             break;
         case 0x12:
             this->opm_Load(this->r_de.value(), &this->r_a);
+            t = 8;
             break;
         case 0x13:
             this->op_Inc(&this->r_de);
+            t = 8;
             break;
         case 0x14:
             this->op_Inc(&this->r_d);
+            t = 4;
             break;
         case 0x15:
             this->op_Dec(&this->r_d);
+            t = 4;
             break;
         case 0x16:
             // Load byte into C
             this->op_Load(&this->r_d);
+            t = 8;
             break;
         case 0x17:
             this->op_RL(&this->r_a);
+            t = 4;
             break;
         case 0x18:
             this->op_JR();
+            t = 12;
             break;
         case 0x19:
             this->op_Add(&this->r_hl, &this->r_de);
+            t = 8;
             break;
         case 0x1a:
             this->opm_Load(&this->r_a, this->r_de.value());
+            t = 8;
             break;
         case 0x1b:
             this->op_Dec(&this->r_de);
+            t = 8;
             break;
         case 0x1c:
             this->op_Inc(&this->r_e);
+            t = 4;
             break;
         case 0x1d:
             this->op_Dec(&this->r_e);
+            t = 4;
             break;
         case 0x1e:
             this->op_Load(&this->r_e);
+            t = 8;
             break;
         case 0x1f:
             this->op_RR(&this->r_a);
+            t = 4;
             break;
         case 0x20:
-            if (this->get_zero_flag() == (uint8_t)0x00)
+            if (this->get_zero_flag() == (uint8_t)0x00) {
                 this->op_JR();
-            else
+                t = 12;  //?
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val8();
+                t = 8;  //?
+            }
             break;
         case 0x21:
             this->op_Load(&this->r_hl);
+            t = 12;
             break;
         case 0x22:
             // Get HL, dec and set
             this->op_Load_Inc(&this->r_hl, &this->r_a);
+            t = 8;
             break;
         case 0x23:
             this->op_Inc(&this->r_hl);
+            t = 8;
             break;
         case 0x24:
             this->op_Inc(&this->r_h);
+            t = 4;
             break;
         case 0x25:
             this->op_Dec(&this->r_h);
+            t = 4;
             break;
         case 0x26:
             this->op_Load(&this->r_h);
+            t = 8;
             break;
         case 0x27:
             this->op_DAA();
+            t = 4;
             break;
         case 0x28:
-            if (this->get_zero_flag() == (uint8_t)0x01)
+            if (this->get_zero_flag() == (uint8_t)0x01) {
                 this->op_JR();
-            else
+                t = 12;  //?
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val8();
+                t = 4;  //?
+            }
             break;
         case 0x29:
             this->op_Add(&this->r_hl, &this->r_hl);
+            t = 8;
             break;
         case 0x2a:
             this->op_Load_Inc(&this->r_a, &this->r_hl);
+            t = 8;
             break;
         case 0x2b:
             this->op_Dec(&this->r_hl);
+            t = 8;
             break;
         case 0x2c:
             this->op_Inc(&this->r_l);
+            t = 4;
             break;
         case 0x2d:
             this->op_Dec(&this->r_l);
+            t = 4;
             break;
         case 0x2e:
             this->op_Load(&this->r_l);
+            t = 8;
             break;
         case 0x2f:
             this->op_CPL();
+            t = 4;
             break;
         case 0x30:
-            if (this->get_carry_flag() == (uint8_t)0x00)
+            if (this->get_carry_flag() == (uint8_t)0x00) {
                 this->op_JR();
-            else
+                t = 12;
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val8();
+                t = 8;
+            }
             break;
         case 0x31:
             // Load 2-bytes into SP
             this->op_Load(&this->r_sp);
+            t = 12;
             break;
         case 0x32:
             // Get HL, dec and set
             this->op_Load_Dec(&this->r_hl, &this->r_a);
+            t = 8;
             break;
         case 0x33:
             this->op_Inc(&this->r_sp);
+            t = 8;
             break;
         case 0x34:
             this->opm_Inc(this->r_hl.value());
+            t = 12;
             break;
         case 0x35:
             this->opm_Dec(this->r_hl.value());
+            t = 12;
             break;
         case 0x36:
             this->opm_Load(this->r_hl.value());
+            t = 12;
             break;
         case 0x37:
             this->op_SCF();
+            t = 4;
             break;
         case 0x38:
-            if (this->get_carry_flag() == (uint8_t)0x01)
+            if (this->get_carry_flag() == (uint8_t)0x01) {
                 this->op_JR();
-            else
+                t = 12;
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val8();
+                t = 8;
+            }
             break;
         case 0x39:
             this->op_Add(&this->r_hl, &this->r_sp);
+            t = 8;
             break;
         case 0x3a:
             // Get HL, dec and set
             this->op_Load_Dec(&this->r_a, &this->r_hl);
+            t = 8;
             break;
         case 0x3b:
             this->op_Dec(&this->r_sp);
+            t = 8;
             break;
         case 0x3c:
             this->op_Inc(&this->r_a);
+            t = 4;
             break;
         case 0x3d:
             this->op_Dec(&this->r_a);
+            t = 4;
             break;
         case 0x3e:
             this->op_Load(&this->r_a);
+            t = 8;
             break;
         case 0x3f:
             this->op_CCF();
+            t = 4;
             break;
         case 0x40:
             this->op_Load(&this->r_b, &this->r_b);
+            t = 4;
             break;
         case 0x41:
             this->op_Load(&this->r_b, &this->r_c);
+            t = 4;
             break;
         case 0x42:
             this->op_Load(&this->r_b, &this->r_d);
+            t = 4;
             break;
         case 0x43:
             this->op_Load(&this->r_b, &this->r_e);
+            t = 4;
             break;
         case 0x44:
             this->op_Load(&this->r_b, &this->r_h);
+            t = 4;
             break;
         case 0x45:
             this->op_Load(&this->r_b, &this->r_l);
+            t = 4;
             break;
         case 0x46:
             this->opm_Load(&this->r_b, this->r_hl.value());
+            t = 8;
             break;
         case 0x47:
             this->op_Load(&this->r_b, &this->r_a);
+            t = 4;
             break;
         case 0x48:
             this->op_Load(&this->r_c, &this->r_b);
+            t = 4;
             break;
         case 0x49:
             this->op_Load(&this->r_c, &this->r_c);
+            t = 4;
             break;
         case 0x4a:
             this->op_Load(&this->r_c, &this->r_d);
+            t = 4;
             break;
         case 0x4b:
             this->op_Load(&this->r_c, &this->r_e);
+            t = 4;
             break;
         case 0x4c:
             this->op_Load(&this->r_c, &this->r_h);
+            t = 4;
             break;
         case 0x4d:
             this->op_Load(&this->r_c, &this->r_l);
+            t = 4;
             break;
         case 0x4e:
             this->opm_Load(&this->r_c, this->r_hl.value());
+            t = 8;
             break;
         case 0x4f:
             this->op_Load(&this->r_c, &this->r_a);
+            t = 4;
             break;
         case 0x50:
             this->op_Load(&this->r_d, &this->r_b);
+            t = 4;
             break;
         case 0x51:
             this->op_Load(&this->r_d, &this->r_c);
+            t = 4;
             break;
         case 0x52:
             this->op_Load(&this->r_d, &this->r_d);
+            t = 4;
             break;
         case 0x53:
             this->op_Load(&this->r_d, &this->r_e);
+            t = 4;
             break;
         case 0x54:
             this->op_Load(&this->r_d, &this->r_h);
+            t = 4;
             break;
         case 0x55:
             this->op_Load(&this->r_d, &this->r_l);
+            t = 4;
             break;
         case 0x56:
             this->opm_Load(&this->r_d, this->r_hl.value());
+            t = 8;
             break;
         case 0x57:
             this->op_Load(&this->r_d, &this->r_a);
+            t = 4;
             break;
         case 0x58:
             this->op_Load(&this->r_e, &this->r_b);
+            t = 4;
             break;
         case 0x59:
             this->op_Load(&this->r_e, &this->r_c);
+            t = 4;
             break;
         case 0x5a:
             this->op_Load(&this->r_e, &this->r_d);
             break;
         case 0x5b:
             this->op_Load(&this->r_e, &this->r_e);
+            t = 4;
             break;
         case 0x5c:
             this->op_Load(&this->r_e, &this->r_h);
+            t = 4;
             break;
         case 0x5d:
             this->op_Load(&this->r_e, &this->r_l);
+            t = 4;
             break;
         case 0x5e:
             this->opm_Load(&this->r_e, this->r_hl.value());
+            t = 8;
             break;
         case 0x5f:
             this->op_Load(&this->r_e, &this->r_a);
+            t = 4;
             break;
         case 0x60:
             this->op_Load(&this->r_h, &this->r_b);
+            t = 4;
             break;
         case 0x61:
             this->op_Load(&this->r_h, &this->r_c);
+            t = 4;
             break;
         case 0x62:
             this->op_Load(&this->r_h, &this->r_d);
+            t = 4;
             break;
         case 0x63:
             this->op_Load(&this->r_h, &this->r_e);
+            t = 4;
             break;
         case 0x64:
             this->op_Load(&this->r_h, &this->r_h);
+            t = 4;
             break;
         case 0x65:
             this->op_Load(&this->r_h, &this->r_l);
+            t = 4;
             break;
         case 0x66:
             this->opm_Load(&this->r_h, this->r_hl.value());
+            t = 8;
             break;
         case 0x67:
             this->op_Load(&this->r_h, &this->r_a);
+            t = 4;
             break;
         case 0x68:
             this->op_Load(&this->r_l, &this->r_b);
+            t = 4;
             break;
         case 0x69:
             this->op_Load(&this->r_l, &this->r_c);
+            t = 4;
             break;
         case 0x6a:
             this->op_Load(&this->r_l, &this->r_d);
+            t = 4;
             break;
         case 0x6b:
             this->op_Load(&this->r_l, &this->r_e);
+            t = 4;
             break;
         case 0x6c:
             this->op_Load(&this->r_l, &this->r_h);
+            t = 4;
             break;
         case 0x6d:
             this->op_Load(&this->r_l, &this->r_l);
+            t = 4;
             break;
         case 0x6e:
             this->opm_Load(&this->r_l, this->r_hl.value());
+            t = 8;
             break;
         case 0x6f:
             this->op_Load(&this->r_l, &this->r_a);
+            t = 4;
             break;
         case 0x70:
             this->opm_Load(this->r_hl.value(), &this->r_b);
+            t = 8;
             break;
         case 0x71:
             this->opm_Load(this->r_hl.value(), &this->r_c);
+            t = 8;
             break;
         case 0x72:
             this->opm_Load(this->r_hl.value(), &this->r_d);
+            t = 8;
             break;
         case 0x73:
             this->opm_Load(this->r_hl.value(), &this->r_e);
+            t = 8;
             break;
         case 0x74:
             this->opm_Load(this->r_hl.value(), &this->r_h);
+            t = 8;
             break;
         case 0x75:
             this->opm_Load(this->r_hl.value(), &this->r_l);
+            t = 8;
             break;
         case 0x76:
             this->op_Halt();
+            t = 4;
             break;
         case 0x77:
             this->opm_Load(this->r_hl.value(), &this->r_a);
+            t = 8;
             break;
         case 0x78:
             this->op_Load(&this->r_a, &this->r_b);
+            t = 4;
             break;
         case 0x79:
             this->op_Load(&this->r_a, &this->r_c);
+            t = 4;
             break;
         case 0x7a:
             this->op_Load(&this->r_a, &this->r_d);
+            t = 4;
             break;
         case 0x7b:
             this->op_Load(&this->r_a, &this->r_e);
+            t = 4;
             break;
         case 0x7c:
             this->op_Load(&this->r_a, &this->r_h);
+            t = 4;
             break;
         case 0x7d:
             this->op_Load(&this->r_a, &this->r_l);
+            t = 4;
             break;
         case 0x7e:
             this->opm_Load(&this->r_a, this->r_hl.value());
+            t = 8;
             break;
         case 0x7f:
             this->op_Load(&this->r_a, &this->r_a);
+            t = 4;
             break;
         case 0x80:
             this->op_Add(&this->r_a, &this->r_b);
+            t = 4;
             break;
         case 0x81:
             this->op_Add(&this->r_a, &this->r_c);
+            t = 4;
             break;
         case 0x82:
             this->op_Add(&this->r_a, &this->r_d);
+            t = 4;
             break;
         case 0x83:
             this->op_Add(&this->r_a, &this->r_e);
+            t = 4;
             break;
         case 0x84:
             this->op_Add(&this->r_a, &this->r_h);
+            t = 4;
             break;
         case 0x85:
             this->op_Add(&this->r_a, &this->r_l);
+            t = 4;
             break;
         case 0x86:
             this->opm_Add(&this->r_a, this->r_hl.value());
+            t = 8;
             break;
         case 0x87:
             this->op_Add(&this->r_a, &this->r_a);
+            t = 4;
             break;
         case 0x88:
             this->op_Adc(&this->r_a, &this->r_b);
+            t = 4;
             break;
         case 0x89:
             this->op_Adc(&this->r_a, &this->r_c);
+            t = 4;
             break;
         case 0x8a:
             this->op_Adc(&this->r_a, &this->r_d);
+            t = 4;
             break;
         case 0x8b:
             this->op_Adc(&this->r_a, &this->r_e);
+            t = 4;
             break;
         case 0x8c:
             this->op_Adc(&this->r_a, &this->r_h);
+            t = 4;
             break;
         case 0x8d:
             this->op_Adc(&this->r_a, &this->r_l);
+            t = 4;
             break;
         case 0x8e:
             this->opm_Adc(&this->r_a, this->r_hl.value());
+            t = 8;
             break;
         case 0x8f:
             this->op_Adc(&this->r_a, &this->r_a);
+            t = 4;
             break;
         case 0x90:
             this->op_Sub(&this->r_b);
+            t = 4;
             break;
         case 0x91:
             this->op_Sub(&this->r_c);
+            t = 4;
             break;
         case 0x92:
             this->op_Sub(&this->r_d);
+            t = 4;
             break;
         case 0x93:
             this->op_Sub(&this->r_e);
+            t = 4;
             break;
         case 0x94:
             this->op_Sub(&this->r_h);
+            t = 4;
             break;
         case 0x95:
             this->op_Sub(&this->r_l);
+            t = 4;
             break;
         case 0x96:
             this->opm_Sub(this->r_hl.value());
+            t = 8;
             break;
         case 0x97:
             this->op_Sub(&this->r_a);
+            t = 4;
             break;
         case 0x98:
-            std::cout << "running 0x98" << std::endl;
             this->op_SBC(&this->r_b);
-            //int nope;
-            //std::cin >> nope;
+            t = 4;
             break;
         case 0x99:
             this->op_SBC(&this->r_c);
+            t = 4;
             break;
         case 0x9a:
             this->op_SBC(&this->r_d);
+            t = 4;
             break;
         case 0x9b:
             this->op_SBC(&this->r_e);
+            t = 4;
             break;
         case 0x9c:
             this->op_SBC(&this->r_h);
+            t = 4;
             break;
         case 0x9d:
             this->op_SBC(&this->r_l);
+            t = 4;
             break;
         case 0x9e:
             this->opm_SBC(this->r_hl.value());
+            t = 8;
             break;
         case 0x9f:
             this->op_SBC(&this->r_a);
+            t = 4;
             break;
         case 0xa0:
             this->op_AND(&this->r_b);
+            t = 4;
             break;
         case 0xa1:
             this->op_AND(&this->r_c);
+            t = 4;
             break;
         case 0xa2:
             this->op_AND(&this->r_d);
+            t = 4;
             break;
         case 0xa3:
             this->op_AND(&this->r_e);
+            t = 4;
             break;
         case 0xa4:
             this->op_AND(&this->r_h);
+            t = 4;
             break;
         case 0xa5:
             this->op_AND(&this->r_l);
+            t = 4;
             break;
         case 0xa6:
             this->opm_AND(this->r_hl.value());
+            t = 8;
             break;
         case 0xa7:
             this->op_AND(&this->r_a);
+            t = 4;
             break;
         case 0xa8:
             this->op_XOR(&this->r_b);
+            t = 4;
             break;
         case 0xa9:
             this->op_XOR(&this->r_c);
+            t = 4;
             break;
         case 0xaa:
             this->op_XOR(&this->r_d);
+            t = 4;
             break;
         case 0xab:
             this->op_XOR(&this->r_e);
+            t = 4;
             break;
         case 0xac:
             this->op_XOR(&this->r_h);
+            t = 4;
             break;
         case 0xad:
             this->op_XOR(&this->r_l);
+            t = 4;
             break;
         case 0xae:
             this->opm_XOR(this->r_hl.value());
+            t = 8;
             break;
         case 0xaf:
             // X-OR A with A into A
             this->op_XOR(&this->r_a);
+            t = 4;
             break;
         case 0xb0:
             this->op_OR(&this->r_b);
+            t = 4;
             break;
         case 0xb1:
             this->op_OR(&this->r_c);
+            t = 4;
             break;
         case 0xb2:
             this->op_OR(&this->r_d);
+            t = 4;
             break;
         case 0xb3:
             this->op_OR(&this->r_e);
+            t = 4;
             break;
         case 0xb4:
             this->op_OR(&this->r_h);
+            t = 4;
             break;
         case 0xb5:
             this->op_OR(&this->r_l);
+            t = 4;
             break;
         case 0xb6:
             this->opm_OR(this->r_hl.value());
+            t = 8;
             break;
         case 0xb7:
             this->op_OR(&this->r_a);
+            t = 4;
             break;
         case 0xb8:
             this->op_CP(&this->r_b);
+            t = 4;
             break;
         case 0xb9:
             this->op_CP(&this->r_c);
+            t = 4;
             break;
         case 0xba:
             this->op_CP(&this->r_d);
+            t = 4;
             break;
         case 0xbb:
             this->op_CP(&this->r_e);
+            t = 4;
             break;
         case 0xbc:
             this->op_CP(&this->r_h);
+            t = 4;
             break;
         case 0xbd:
             this->op_CP(&this->r_l);
+            t = 4;
             break;
         case 0xbe:
             this->opm_CP(this->r_hl.value());
+            t = 8;
             break;
         case 0xbf:
             this->op_CP(&this->r_a);
+            t = 4;
             break;
         case 0xc0:
-            if (this->get_zero_flag() == 0x00)
+            if (this->get_zero_flag() == 0x00) {
                 this->op_Return();
+                t = 20;
+            } else {
+                t = 8;
+            }
             break;
         case 0xc1:
             this->op_Pop(&this->r_bc);
+            t = 12;
             break;
         case 0xc2:
-            if (this->get_zero_flag() == 0x00)
+            if (this->get_zero_flag() == 0x00) {
                 this->op_JP();
-            else
+                t = 16;
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val16();
+                t = 12;
+            }
             break;
         case 0xc3:
             this->op_JP();
+            t = 16;
             break;
         case 0xc4:
-            if (this->get_zero_flag() == 0x00)
+            if (this->get_zero_flag() == 0x00) {
                 this->op_Call();
-            else
+                t = 16;
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val16();
+                t = 12;
+            }
             break;
         case 0xc5:
             this->op_Push(&this->r_bc);
+            t = 16;
             break;
         case 0xc6:
             this->op_Add(&this->r_a);
+            t = 8;
             break;
         case 0xc7:
             this->op_RST(0x0000);
+            t = 16;
             break;
         case 0xc8:
-            if (this->get_zero_flag() == 0x01)
+            if (this->get_zero_flag() == 0x01) {
                 this->op_Return();
+                t = 20;
+            } else {
+                t = 8;
+            }
             break;
         case 0xc9:
             this->op_Return();
+            t = 16;
             break;
         case 0xca:
-            if (this->get_zero_flag() == 0x01)
+            if (this->get_zero_flag() == 0x01) {
                 this->op_JP();
-            else
+                t = 16;
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val16();
+                t = 12;
+            }
             break;
         case 0xcb:
             // Set flag for CB
             this->cb_state = true;
+            t = 4;
             break;
         case 0xcc:
-            if (this->get_zero_flag() == 0x01)
+            if (this->get_zero_flag() == 0x01) {
                 this->op_Call();
-            else
+                t = 24;
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val16();
+                t = 12;
+            }
             break;
         case 0xcd:
             this->op_Call();
+            t = 24;
             break;
         case 0xce:
             this->op_Adc(&this->r_a);
+            t = 8;
             break;
         case 0xcf:
             this->op_RST(0x0008);
+            t = 16;
             break;
         case 0xd0:
-            if (this->get_carry_flag() == 0x00)
+            if (this->get_carry_flag() == 0x00) {
                 this->op_Return();
+                t = 20;
+            } else {
+                t = 8;
+            }
             break;
         case 0xd1:
             this->op_Pop(&this->r_de);
+            t = 12;
             break;
         case 0xd2:
-            if (this->get_carry_flag() == 0x00)
+            if (this->get_carry_flag() == 0x00) {
                 this->op_JP();
-            else
+                t = 16;
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val16();
+                t = 12;
+            }
             break;
         case 0xd4:
-            if (this->get_carry_flag() == 0x00)
+            if (this->get_carry_flag() == 0x00) {
                 this->op_Call();
-            else
+                t = 24;
+            }
+            else {
                 this->get_inc_pc_val16();
+                t = 12;
+            }
             break;
         case 0xd5:
             this->op_Push(&this->r_de);
+            t = 16;
             break;
         case 0xd6:
             this->op_Sub();
+            t = 8;
             break;
         case 0xd7:
             this->op_RST(0x0010);
+            t = 16;
             break;
         case 0xd8:
-            if (this->get_carry_flag() == 0x01)
+            if (this->get_carry_flag() == 0x01) {
                 this->op_Return();
+                t = 20;
+            } else {
+                t = 8;
+            }
             break;
         case 0xd9:
             this->op_Return();
             // Re-enable interupts
             this->op_EI();
+            t = 16;
             break;
         case 0xda:
-            if (this->get_carry_flag() == 0x01)
+            if (this->get_carry_flag() == 0x01) {
                 this->op_JP();
-            else
+                t = 16;
+            }
+            else {
                 // If we don't perform the OP, pull
                 // data from ram to inc PC
                 this->get_inc_pc_val16();
+                t = 12;
+            }
             break;
         case 0xdc:
-            if (this->get_carry_flag() != 0x00)
+            if (this->get_carry_flag() != 0x00) {
                 this->op_Call();
-            else
+                t = 24;
+            }
+            else {
                 this->get_inc_pc_val16();
+                t = 12;
+            }
             break;
         case 0xde:
             this->op_SBC();
+            t = 8;
             break;
         case 0xdf:
             this->op_RST(0x0018);
+            t = 16;
             break;
         case 0xe0:
             this->opm_Load((uint16_t)((uint16_t)0xff00 + this->get_inc_pc_val8()), &this->r_a);
+            t = 12;
             break;
         case 0xe1:
             this->op_Pop(&this->r_hl);
+            t = 12;
             break;
         case 0xe2:
             this->opm_Load((uint16_t)((uint16_t)0xff00 + this->r_c.get_value()), &this->r_a);
+            t = 8;
             break;
         case 0xe5:
             this->op_Push(&this->r_hl);
+            t = 16;
             break;
         case 0xe6:
             this->op_AND();
+            t = 8;
             break;
         case 0xe7:
             this->op_RST(0x0020);
             break;
         case 0xe8:
             this->op_Add(&this->r_sp, this->get_inc_pc_val8s());
+            t = 16;
             break;
         case 0xe9:
             this->op_JP(this->r_hl.value());
+            t = 4;
             break;
         case 0xea:
             this->opm_Load(this->get_inc_pc_val16(), &this->r_a);
+            t = 16;
             break;
         // No available OPs here
         case 0xee:
             this->op_XOR(this->get_inc_pc_val8());
+            t = 8;
             break;
         case 0xef:
             this->op_RST(0x0028);
+            t = 16;
             break;
         case 0xf0:
             this->opm_Load(&this->r_a, (uint16_t)(0xff00 + this->get_inc_pc_val8()));
+            t = 12;
             break;
         case 0xf1:
             this->op_Pop(&this->r_af);
             // Purge anything in the LSB nibble of the flag
             this->r_f.set_value(this->r_f.get_value() & 0xf0);
+            t = 12;
             break;
         case 0xf2:
             this->opm_Load(&this->r_a, (uint16_t)(0xff00 + this->r_c.get_value()));
+            t = 8;
             break;
         case 0xf3:
             // Disable interupts
             this->op_DI();
+            t = 4;
             break;
         case 0xf5:
             this->op_Push(&this->r_af);
+            t = 16;
             break;
         case 0xf6:
             this->op_OR();
+            t = 8;
             break;
         case 0xf7:
             this->op_RST(0x0030);
+            t = 16;
             break;
         case 0xf8:
             this->op_Load(&this->r_hl, (uint16_t)(this->r_sp.get_value() + this->get_inc_pc_val8s()));
@@ -1164,22 +1456,28 @@ void CPU::execute_op_code(unsigned int op_val) {
             // @TODO Verify these two
             this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
             this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, 0U);
+            t = 12;
             break;
         case 0xf9:
             this->op_Load(&this->r_sp, &this->r_hl);
+            t = 8;
             break;
         case 0xfa:
             this->opm_Load(&this->r_a, this->get_inc_pc_val16());
+            t = 16;
             break;
         case 0xfb:
             // Enable interupts
             this->op_EI();
+            t = 4;
             break;
         case 0xfe:
             this->op_CP();
+            t = 8;
             break;
         case 0xff:
             this->op_RST(0x0028);
+            t = 16;
             break;
 
         default:
@@ -1192,9 +1490,15 @@ void CPU::execute_op_code(unsigned int op_val) {
             }
             break;
     }
+    if (t == 0) {
+        std::cout << "WARNING - No ticks defined for Opcode!" << std::endl;
+    }
+    return t;
 }
 
-void CPU::execute_cb_code(unsigned int op_val) {
+uint8_t CPU::execute_cb_code(unsigned int op_val) {
+    // ticks
+    uint8_t t = 0;
     switch(op_val) {
         case 0x00:
             this->op_RLC(&this->r_b);
@@ -1219,6 +1523,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x07:
             this->op_RLC(&this->r_a);
+            t = 4;
             break;
         case 0x08:
             this->op_RRC(&this->r_b);
@@ -1267,6 +1572,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x17:
             this->op_RL(&this->r_a);
+            t = 4;
             break;
         case 0x18:
             this->op_RR(&this->r_b);
@@ -1343,27 +1649,35 @@ void CPU::execute_cb_code(unsigned int op_val) {
 
         case 0x30:
             this->op_Swap(&this->r_b);
+            t = 8;
             break;
         case 0x31:
             this->op_Swap(&this->r_c);
+            t = 8;
             break;
         case 0x32:
             this->op_Swap(&this->r_d);
+            t = 8;
             break;
         case 0x33:
             this->op_Swap(&this->r_e);
+            t = 8;
             break;
         case 0x34:
             this->op_Swap(&this->r_h);
+            t = 8;
             break;
         case 0x35:
             this->op_Swap(&this->r_l);
+            t = 8;
             break;
         case 0x36:
             this->opm_Swap(this->r_hl.value());
+            t = 16;
             break;
         case 0x37:
             this->op_Swap(&this->r_a);
+            t = 8;
             break;
         case 0x38:
             this->op_SRL(&this->r_b);
@@ -1975,6 +2289,7 @@ void CPU::execute_cb_code(unsigned int op_val) {
             }
             break;
     }
+    return t;
 }
 
 
@@ -2252,7 +2567,7 @@ void CPU::op_DAA()
             this->r_a.set_value(this->r_a.get_value() - 0x06);
         }
     }
-        
+
     this->set_zero_flag(this->r_a.get_value());
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
 }

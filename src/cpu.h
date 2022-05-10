@@ -141,8 +141,11 @@ protected:
 
     void print_state_m();
 
-    void execute_op_code(unsigned int op_val);
-    void execute_cb_code(unsigned int op_val);
+    uint8_t execute_op_code(unsigned int op_val);
+    uint8_t execute_cb_code(unsigned int op_val);
+
+    // Current ticks to execute operation
+    uint8_t current_op_ticks;
 
     void check_interupts();
     int checked_op_codes[1000];
