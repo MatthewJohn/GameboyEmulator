@@ -66,17 +66,17 @@ int main(int argc, char* args[])
     // Tests
     // 01-special.gb
     // 02-interrupts.gb
-    // 03-op sp,hl.gb
-    // 04-op r,imm.gb - fail (de)
-    // 05-op rp.gb -passed
+    // 03-op sp,hl.gb - hangs
+    // 04-op r,imm.gb - passed
+    // 05-op rp.gb - passed
     // 06-ld r,r.gb - pased
-    // 07-jr,jp,call,ret,rst.gb
+    // 07-jr,jp,call,ret,rst.gb - hangs
     // 08-misc instrs.gb
-    // 09-op r,r.gb
-    // 10-bit ops.gb -- passed
-    // 11-op a,(hl).gb - (9e 27 failed)
+    // 09-op r,r.gb - passed
+    // 10-bit ops.gb - passed
+    // 11-op a,(hl).gb - (34 and 27 failed)
 
-    char rom_path[] = "./resources/test_roms/cpu_instrs/individual/09-op r,r.gb";
+    char rom_path[] = "./resources/test_roms/cpu_instrs/individual/11-op a,(hl).gb";
     //char rom_path[] = "./debug/testrom.gb";
     //char rom_path[] = "./copyright/dmg_test_prog_ver1.gb";
     ram_inst->load_bios(bios_path);
