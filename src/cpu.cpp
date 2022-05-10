@@ -2721,6 +2721,8 @@ void CPU::op_RL(reg8 *src) {
     // If not RLA, set zero flag
     if (this->cb_state)
         this->set_zero_flag(src->get_value());
+    else
+        this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
 }
@@ -2746,6 +2748,8 @@ void CPU::op_RR(reg8 *src) {
     // If not RRA, set zero flag
     if (this->cb_state)
         this->set_zero_flag(src->get_value());
+    else
+        this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, 0U);
 
     this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
     this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
