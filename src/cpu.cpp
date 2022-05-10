@@ -1484,7 +1484,7 @@ uint8_t CPU::execute_op_code(unsigned int op_val) {
             t = 8;
             break;
         case 0xff:
-            this->op_RST(0x0028);
+            this->op_RST(0x0038);
             t = 16;
             break;
 
