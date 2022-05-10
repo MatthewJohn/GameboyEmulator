@@ -1498,7 +1498,7 @@ uint8_t CPU::execute_op_code(unsigned int op_val) {
 
 uint8_t CPU::execute_cb_code(unsigned int op_val) {
     // ticks
-    uint8_t t = 0;
+    uint8_t t = 8;
     switch(op_val) {
         case 0x00:
             this->op_RLC(&this->r_b);
@@ -1520,6 +1520,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x06:
             this->opm_RLC(this->r_hl.value());
+            t = 16;
             break;
         case 0x07:
             this->op_RLC(&this->r_a);
@@ -1545,6 +1546,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x0e:
             this->opm_RRC(this->r_hl.value());
+            t = 16;
             break;
         case 0x0f:
             this->op_RRC(&this->r_a);
@@ -1569,10 +1571,10 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x16:
             this->opm_RL(this->r_hl.value());
+            t = 16;
             break;
         case 0x17:
             this->op_RL(&this->r_a);
-            t = 4;
             break;
         case 0x18:
             this->op_RR(&this->r_b);
@@ -1594,6 +1596,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x1e:
             this->opm_RR(this->r_hl.value());
+            t = 16;
             break;
         case 0x1f:
             this->op_RR(&this->r_a);
@@ -1618,6 +1621,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x26:
             this->opm_SLA(this->r_hl.value());
+            t = 16;
             break;
         case 0x27:
             this->op_SLA(&this->r_a);
@@ -1642,6 +1646,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x2e:
             this->opm_SRA(this->r_hl.value());
+            t = 16;
             break;
         case 0x2f:
             this->op_SRA(&this->r_a);
@@ -1649,27 +1654,21 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
 
         case 0x30:
             this->op_Swap(&this->r_b);
-            t = 8;
             break;
         case 0x31:
             this->op_Swap(&this->r_c);
-            t = 8;
             break;
         case 0x32:
             this->op_Swap(&this->r_d);
-            t = 8;
             break;
         case 0x33:
             this->op_Swap(&this->r_e);
-            t = 8;
             break;
         case 0x34:
             this->op_Swap(&this->r_h);
-            t = 8;
             break;
         case 0x35:
             this->op_Swap(&this->r_l);
-            t = 8;
             break;
         case 0x36:
             this->opm_Swap(this->r_hl.value());
@@ -1677,7 +1676,6 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x37:
             this->op_Swap(&this->r_a);
-            t = 8;
             break;
         case 0x38:
             this->op_SRL(&this->r_b);
@@ -1699,6 +1697,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x3e:
             this->opm_SRL(this->r_hl.value());
+            t = 16;
             break;
         case 0x3f:
             this->op_SRL(&this->r_a);
@@ -1723,6 +1722,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x46:
             this->opm_Bit(0, this->r_hl.value());
+            t = 16;
             break;
         case 0x47:
             this->op_Bit(0, &this->r_a);
@@ -1747,6 +1747,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x4e:
             this->opm_Bit(1, this->r_hl.value());
+            t = 16;
             break;
         case 0x4f:
             this->op_Bit(1, &this->r_a);
@@ -1771,6 +1772,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x56:
             this->opm_Bit(2, this->r_hl.value());
+            t = 16;
             break;
         case 0x57:
             this->op_Bit(2, &this->r_a);
@@ -1795,6 +1797,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x5e:
             this->opm_Bit(3, this->r_hl.value());
+            t = 16;
             break;
         case 0x5f:
             this->op_Bit(3, &this->r_a);
@@ -1819,6 +1822,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x66:
             this->opm_Bit(4, this->r_hl.value());
+            t = 16;
             break;
         case 0x67:
             this->op_Bit(4, &this->r_a);
@@ -1843,6 +1847,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x6e:
             this->opm_Bit(5, this->r_hl.value());
+            t = 16;
             break;
         case 0x6f:
             this->op_Bit(5, &this->r_a);
@@ -1867,6 +1872,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x76:
             this->opm_Bit(6, this->r_hl.value());
+            t = 16;
             break;
         case 0x77:
             this->op_Bit(6, &this->r_a);
@@ -1891,6 +1897,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x7e:
             this->opm_Bit(7, this->r_hl.value());
+            t = 16;
             break;
         case 0x7f:
             this->op_Bit(7, &this->r_a);
@@ -1915,6 +1922,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x86:
             this->opm_Res(0, this->r_hl.value());
+            t = 16;
             break;
         case 0x87:
             this->op_Res(0, &this->r_a);
@@ -1939,6 +1947,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x8e:
             this->opm_Res(1, this->r_hl.value());
+            t = 16;
             break;
         case 0x8f:
             this->op_Res(1, &this->r_a);
@@ -1963,6 +1972,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x96:
             this->opm_Res(2, this->r_hl.value());
+            t = 16;
             break;
         case 0x97:
             this->op_Res(2, &this->r_a);
@@ -1987,6 +1997,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0x9e:
             this->opm_Res(3, this->r_hl.value());
+            t = 16;
             break;
         case 0x9f:
             this->op_Res(3, &this->r_a);
@@ -2011,6 +2022,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xa6:
             this->opm_Res(4, this->r_hl.value());
+            t = 16;
             break;
         case 0xa7:
             this->op_Res(4, &this->r_a);
@@ -2035,6 +2047,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xae:
             this->opm_Res(5, this->r_hl.value());
+            t = 16;
             break;
         case 0xaf:
             this->op_Res(5, &this->r_a);
@@ -2059,6 +2072,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xb6:
             this->opm_Res(6, this->r_hl.value());
+            t = 16;
             break;
         case 0xb7:
             this->op_Res(6, &this->r_a);
@@ -2083,6 +2097,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xbe:
             this->opm_Res(7, this->r_hl.value());
+            t = 16;
             break;
         case 0xbf:
             this->op_Res(7, &this->r_a);
@@ -2107,6 +2122,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xc6:
             this->opm_Set(0, this->r_hl.value());
+            t = 16;
             break;
         case 0xc7:
             this->op_Set(0, &this->r_a);
@@ -2131,6 +2147,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xce:
             this->opm_Set(1, this->r_hl.value());
+            t = 16;
             break;
         case 0xcf:
             this->op_Set(1, &this->r_a);
@@ -2155,6 +2172,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xd6:
             this->opm_Set(2, this->r_hl.value());
+            t = 16;
             break;
         case 0xd7:
             this->op_Set(2, &this->r_a);
@@ -2179,6 +2197,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xde:
             this->opm_Set(3, this->r_hl.value());
+            t = 16;
             break;
         case 0xdf:
             this->op_Set(3, &this->r_a);
@@ -2203,6 +2222,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xe6:
             this->opm_Set(4, this->r_hl.value());
+            t = 16;
             break;
         case 0xe7:
             this->op_Set(4, &this->r_a);
@@ -2227,6 +2247,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xee:
             this->opm_Set(5, this->r_hl.value());
+            t = 16;
             break;
         case 0xef:
             this->op_Set(5, &this->r_a);
@@ -2251,6 +2272,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xf6:
             this->opm_Set(6, this->r_hl.value());
+            t = 16;
             break;
         case 0xf7:
             this->op_Set(6, &this->r_a);
@@ -2275,6 +2297,7 @@ uint8_t CPU::execute_cb_code(unsigned int op_val) {
             break;
         case 0xfe:
             this->opm_Set(7, this->r_hl.value());
+            t = 16;
             break;
         case 0xff:
             this->op_Set(7, &this->r_a);
