@@ -173,7 +173,10 @@ void CPU::tick() {
     if (this->get_timer_state())
         this->increment_timer();
     
-    this->check_interupts();
+    // Check for interupts if internal state is true
+    if (this->interupt_state == this->INTERUPT_STATE::ENABLED ||
+            this->interupt_state == this->INTERUPT_STATE::PENDING_DISABLE)
+        this->check_interupts();
 
     // Check if interupt state is in a pending state
     // and move to actual state, since a clock cycle has been waited
@@ -271,14 +274,14 @@ void CPU::debug_post_tick()
 
 bool CPU::get_timer_state()
 {
-    return (this->ram->get_ram_bit(this->TAC_TIMER_CONTROL_MEM_ADDRESS, 0x02) == 1U);
+    return (this->ram->get_ram_bit(this->TAC_TIMER_CONTROL_MEM_ADDRESS, 0x02) == 0x1);
 }
 
 void CPU::increment_timer()
 {
     unsigned int freq = this->TIMER_FREQ[this->ram->get_val(this->TAC_TIMER_CONTROL_MEM_ADDRESS) & 0x03];
     this->timer_itx ++;
-    
+    std::cout << "INcrmeenting timer!" << std::endl;
     // If CPU count since last tick is greater/equal to CPU frequency/timer frequency
     // increment timer in mem
     if (this->timer_itx >= (this->CPU_FREQ / freq))
@@ -374,10 +377,11 @@ void CPU::check_interupts() {
         }
     }
 
-    // Check if timer interupt set
-    if (this->ram->get_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 2))
+    // Check if timer has been triggered and interupt is enabled
+    if (this->ram->get_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 2) &&
+        this->ram->get_ram_bit(this->INTERUPT_IE_REGISTER_ADDRESS, 2))
     {
-        // Reset interupt bit
+        // Reset interupt user interupt bit
         this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 3, 0);
 
         // If interupt state is either enabled or pending disable,
@@ -387,6 +391,8 @@ void CPU::check_interupts() {
             if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
                 std::cout << "Got TIMER INTERUPT!" << std::endl;
 
+            // Push current pointer to stack and update PC to
+            // interupt address
             this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
             this->r_pc.set_value(this->ram->get_val(this->TIMER_INTERUPT_PTR_ADDR));
         }

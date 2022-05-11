@@ -107,6 +107,7 @@ protected:
 
     // Interupts
     const uint16_t INTERUPT_IF_REGISTER_ADDRESS = 0xff0f;
+    const uint16_t INTERUPT_IE_REGISTER_ADDRESS = 0xffff;
 
     // Timer config
     const int TIMER_FREQ[4] = {4096, 262144, 65536, 16384};

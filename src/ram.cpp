@@ -129,7 +129,7 @@ uint8_t RAM::v_inc(uint16_t address) {
 }
 
 
-unsigned int RAM::get_ram_bit(uint16_t address, unsigned int bit_shift) {
+uint8_t RAM::get_ram_bit(uint16_t address, unsigned int bit_shift) {
     return ((this->get_val(address) & (1U  << bit_shift)) >> bit_shift);
 }
 uint8_t RAM::set_ram_bit(uint16_t address, uint8_t bit_shift, unsigned int val) {

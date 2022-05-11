@@ -41,7 +41,7 @@ public:
     void load_rom(char *rom_path);
     bool boot_rom_swapped;
 
-    unsigned int get_ram_bit(uint16_t address, unsigned int bit_shift);
+    uint8_t get_ram_bit(uint16_t address, unsigned int bit_shift);
     uint8_t set_ram_bit(uint16_t address, uint8_t bit_shift, unsigned int val);
 
     // Video addresses
