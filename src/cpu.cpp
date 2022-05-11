@@ -26,7 +26,7 @@
 //#define STEPIN 0x0101
 //#define STEPIN 0x07f2
 //#define STEPIN 0x00//x0217//x075b
-#define STEPIN 0x00//0x100
+#define STEPIN 0xc48c//0xc781//0x00//0x100
 
 //#define STEPIN 0 //0x06ef //0x0271 //0x029d
 #define DEBUG_POINT 0//xc4a0//x02b7//x086f//x086f//x0870
@@ -151,21 +151,23 @@ bool CPU::is_running() {
 void CPU::tick() {
     this->tick_counter ++;
 
-    if (DEBUG_EVERY != 1 && this->tick_counter % DEBUG_EVERY == 0)
-        std::cout << this->tick_counter << " Tick: " << std::hex << this->r_pc.get_value() << ", SP: " << this->r_sp.get_value() << std::endl;
-        //this->running = false;
-    if (STEPIN_AFTER && (! this->stepped_in) && this->tick_counter >= STEPIN_AFTER)
-        this->stepped_in = true;
+    if (this->current_op_ticks == 0) {
+        if (DEBUG_EVERY != 1 && this->tick_counter % DEBUG_EVERY == 0)
+            std::cout << this->tick_counter << " Tick: " << std::hex << this->r_pc.get_value() << ", SP: " << this->r_sp.get_value() << std::endl;
+            //this->running = false;
+        if (STEPIN_AFTER && (! this->stepped_in) && this->tick_counter >= STEPIN_AFTER)
+            this->stepped_in = true;
 
-    if (DEBUG || this->stepped_in) {
-        if (! this->stepped_in) {
+        if (DEBUG || this->stepped_in) {
+            if (! this->stepped_in) {
+                this->print_state_m();
+            }
+            std::cout << std::endl << std::endl << "New Tick: " << std::hex << this->r_pc.get_value() << ", SP: " << this->r_sp.get_value() << std::endl;
+        } else if (DEBUG_POINT && this->r_pc.get_value() == DEBUG_POINT)
+        {
             this->print_state_m();
+            std::cin.get();
         }
-        std::cout << std::endl << std::endl << "New Tick: " << std::hex << this->r_pc.get_value() << ", SP: " << this->r_sp.get_value() << std::endl;
-    } else if (DEBUG_POINT && this->r_pc.get_value() == DEBUG_POINT)
-    {
-        this->print_state_m();
-        std::cin.get();
     }
     
     if (this->get_timer_state())
@@ -187,7 +189,7 @@ void CPU::tick() {
         return;
 
     // Determine stepped-in before PC is incremented
-    if ((STEPIN == 1 || (STEPIN + 1) == this->r_pc.get_value() ||
+    if (this->current_op_ticks == 0 && (STEPIN == 1 || (STEPIN + 1) == this->r_pc.get_value() ||
         STEPIN == this->r_pc.get_value()) && STEPIN != 0)
     {
         std::cout << std::hex << (unsigned int)this->ram->get_val((uint16_t)0x8010) <<
@@ -207,7 +209,8 @@ void CPU::tick() {
     // Read value from memory, incrementing PC
     this->op_val = (unsigned int)this->get_inc_pc_val8();
 
-    //this->debug_op_codes(op_this->val);
+    if (this->stepped_in || DEBUG)
+        this->debug_op_codes(this->op_val);
 
     if (this->cb_state) {
         this->current_op_ticks = this->execute_cb_code(this->op_val);
@@ -229,7 +232,7 @@ void CPU::tick() {
 void CPU::debug_op_codes(unsigned int op_val)
 {
     // TEMP CHECK ALL OPCODES
-    this->debug_opcode = false;
+    //this->debug_opcode = false;
     if ((!this->cb_state) && (! (std::find(std::begin(this->checked_op_codes), std::end(this->checked_op_codes), op_val) != std::end(this->checked_op_codes))))
     {
         this->checked_op_codes[this->checked_op_codes_itx] = op_val;
@@ -318,7 +321,7 @@ void CPU::check_interupts() {
     {
         if (! this->v_blank_executed)
         {
-            if (true || INTERUPT_DEBUG || DEBUG || this->stepped_in)
+            if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
                 std::cout << std::hex << "Got v-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
 
             // Store PC on the stack
@@ -1403,6 +1406,7 @@ uint8_t CPU::execute_op_code(unsigned int op_val) {
             break;
         case 0xe7:
             this->op_RST(0x0020);
+            t = 16;
             break;
         case 0xe8:
             this->op_Add(&this->r_sp, this->get_inc_pc_val8s());
@@ -3227,10 +3231,9 @@ void CPU::op_JR() {
 
     if (DEBUG || this->stepped_in)
         std::cout << "Jump from " << std::hex << (unsigned int)this->r_pc.get_value() << " by " << signed(jp);
-    // @TODO Verify that this jumps by the value AFTER the pc increment
-    // for this instruction.
+    // Setting this to the 'current OP' PC appears to break the BIOS,
+    // so basically confirmed this functionality.
     this->r_pc.set_value(this->r_pc.get_value() + jp);
-    //this->r_pc.value --;
     if (DEBUG || this->stepped_in)
         std::cout << " to " << std::hex << this->r_pc.get_value() << std::endl;
 }
@@ -3247,8 +3250,6 @@ void CPU::op_JP(combined_reg *jmp_reg) {
 void CPU::op_JP(uint16_t jump_to) {
     if (true || DEBUG || this->stepped_in)
         std::cout << std::hex << "Jump from " << (int)this->r_pc.get_value() << " to " << (int)jump_to << std::endl;
-    // @TODO Verify that this jumps by the value AFTER the pc increment
-    // for this instruction.
     this->r_pc.set_value(jump_to);
 }
 
@@ -3257,7 +3258,7 @@ void CPU::op_RST(uint16_t memory_addr) {
     if (DEBUG || this->stepped_in)
         std::cout << "Jumping from: " << std::hex << this->r_pc.get_value() << " to " << (int)memory_addr << std::endl;
 
-    // Push PC (which has already been incremented) to stack
+    // Push PC to of current op to stack
     this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
 
     // Set PC to jump destination address
