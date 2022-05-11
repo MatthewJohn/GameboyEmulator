@@ -142,6 +142,14 @@ void CPU::reset_state()
     this->running = true;
     this->stepped_in = false;
     this->timer_overflow = false;
+    
+    const uint8_t initial_ff00_memory_values[48] = {
+        0xcf, 0x00, 0x7e, 0xff, 0x00, 0x00, 0x00, 0xf8,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xe1,
+        0x80, 0x3f, 0x00, 0xff, 0xbf, 0xff, 0x3f, 0x00
+    };
+    for (uint16_t mem_itx = 0; mem_itx < 16; mem_itx ++)
+        this->ram->set(0xff00 + mem_itx, initial_ff00_memory_values[mem_itx]);
 }
 
 bool CPU::is_running() {
