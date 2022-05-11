@@ -3286,7 +3286,7 @@ void CPU::op_JP(combined_reg *jmp_reg) {
     this->op_JP(jmp_reg->value());
 }
 void CPU::op_JP(uint16_t jump_to) {
-    if (true || DEBUG || this->stepped_in)
+    if (DEBUG || this->stepped_in)
         std::cout << std::hex << "Jump from " << (int)this->r_pc.get_value() << " to " << (int)jump_to << std::endl;
     this->r_pc.set_value(jump_to);
 }
