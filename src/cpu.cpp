@@ -26,7 +26,7 @@
 //#define STEPIN 0x0101
 //#define STEPIN 0x07f2
 //#define STEPIN 0x00//x0217//x075b
-#define STEPIN 0xc48c//0xc781//0x00//0x100
+#define STEPIN 0//0xc781//0x00//0x100
 
 //#define STEPIN 0 //0x06ef //0x0271 //0x029d
 #define DEBUG_POINT 0//xc4a0//x02b7//x086f//x086f//x0870
@@ -173,10 +173,7 @@ void CPU::tick() {
     if (this->get_timer_state())
         this->increment_timer();
     
-    // If interupt state is either enabled or pending disable,
-    // check interupts
-    if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
-        this->check_interupts();
+    this->check_interupts();
 
     // Check if interupt state is in a pending state
     // and move to actual state, since a clock cycle has been waited
@@ -274,12 +271,12 @@ void CPU::debug_post_tick()
 
 bool CPU::get_timer_state()
 {
-    return (this->ram->get_ram_bit(this->TIMER_CONTROL_MEM_ADDR, 0x02) == 1U);
+    return (this->ram->get_ram_bit(this->TAC_TIMER_CONTROL_MEM_ADDRESS, 0x02) == 1U);
 }
 
 void CPU::increment_timer()
 {
-    unsigned int freq = this->TIMER_FREQ[this->ram->get_val(this->TIMER_CONTROL_MEM_ADDR) & 0x03];
+    unsigned int freq = this->TIMER_FREQ[this->ram->get_val(this->TAC_TIMER_CONTROL_MEM_ADDRESS) & 0x03];
     this->timer_itx ++;
     
     // If CPU count since last tick is greater/equal to CPU frequency/timer frequency
@@ -287,12 +284,20 @@ void CPU::increment_timer()
     if (this->timer_itx >= (this->CPU_FREQ / freq))
     {
         this->timer_itx = 0;
-        this->ram->inc(0xff05);
-        std::cout << "Timer tick!" << std::endl;
+        this->ram->inc(this->TIMA_TIMER_COUNTER_ADDRESS);
+        //std::cout << "Timer tick!" << std::endl;
         
-        // If memory has overflowed, then
-        // signal for an interupt
-        this->timer_overflow = true;
+        // Check if timer overflowed
+        if (this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
+        {
+            // Set timer interupt
+            this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 3, 1);
+            // Reset counter value back to moduli
+            this->ram->set(
+                this->TIMA_TIMER_COUNTER_ADDRESS,
+                this->ram->get_val(this->TMA_TIMER_INTERUPT_MODULO_ADDRESS)
+            );
+        }
     }
 }
 
@@ -316,58 +321,76 @@ void CPU::print_state_m() {
 }
 
 void CPU::check_interupts() {
-    // Check VPU V-Blank interupt
-    if ((this->ram->get_val(this->ram->LCDC_STATUS_ADDR) & (uint8_t)0x11))
+    // If interupt state is either enabled or pending disable,
+    // check interupts
+    if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
     {
-        if (! this->v_blank_executed)
+        // Check VPU V-Blank interupt
+        if ((this->ram->get_val(this->ram->LCDC_STATUS_ADDR) & (uint8_t)0x11))
+        {
+            if (! this->v_blank_executed)
+            {
+                if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
+                    std::cout << std::hex << "Got v-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
+
+                // Store PC on the stack
+                this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
+                // Jump to 0x0040
+                this->r_pc.set_value((uint8_t)0x0040);
+                
+                // Mark interupt for h_blank as being executed
+                this->v_blank_executed = true;
+                
+                // Return to ensure no other interupts are processed.
+                return;
+            }
+        }
+        else
+        {
+            this->v_blank_executed = false;
+        }
+
+        if ((this->ram->get_val(this->ram->LCDC_STATUS_ADDR) & (uint8_t)0x08))
+        {
+            if (! this->h_blank_executed)
+            {
+                if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
+                    std::cout << std::hex << "Got h-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
+
+                // Do a straight jump to 0x0048
+                this->r_pc.set_value((uint8_t)0x0048);
+            
+                // Mark interupt for h_blank as being executed
+                this->h_blank_executed = true;
+
+                // Return to ensure no other interupts are processed.
+                return;
+            }
+        }
+        else
+        {
+            // Reset, since we're out of the h_blank period
+            this->h_blank_executed = false;
+        }
+    }
+
+    // Check if timer interupt set
+    if (this->ram->get_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 2))
+    {
+        // Reset interupt bit
+        this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 3, 0);
+
+        // If interupt state is either enabled or pending disable,
+        // jump to interupt address
+        if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
         {
             if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << std::hex << "Got v-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
+                std::cout << "Got TIMER INTERUPT!" << std::endl;
 
-            // Store PC on the stack
             this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-            // Jump to 0x0040
-            this->r_pc.set_value((uint8_t)0x0040);
-            
-            // Mark interupt for h_blank as being executed
-            this->v_blank_executed = true;
-            
-            // Return to ensure no other interupts are processed.
-            return;
+            this->r_pc.set_value(this->ram->get_val(this->TIMER_INTERUPT_PTR_ADDR));
         }
-    }
-    else
-    {
-        this->v_blank_executed = false;
-    }
 
-    if ((this->ram->get_val(this->ram->LCDC_STATUS_ADDR) & (uint8_t)0x08))
-    {
-        if (! this->h_blank_executed)
-        {
-            if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << std::hex << "Got h-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
-
-            // Do a straight jump to 0x0048
-            this->r_pc.set_value((uint8_t)0x0048);
-        
-            // Mark interupt for h_blank as being executed
-            this->h_blank_executed = true;
-
-            // Return to ensure no other interupts are processed.
-            return;
-        }
-    }
-    else
-    {
-        // Reset, since we're out of the h_blank period
-        this->h_blank_executed = false;
-    }
-
-    if (this->timer_overflow)
-    {
-        this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->ram->get_val(this->TIMER_INTERUPT_PTR_ADDR));
         return;
     }
 }

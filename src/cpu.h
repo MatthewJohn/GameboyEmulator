@@ -105,10 +105,15 @@ protected:
 
     const int CPU_FREQ = 4000000;
 
+    // Interupts
+    const uint16_t INTERUPT_IF_REGISTER_ADDRESS = 0xff0f;
+
     // Timer config
     const int TIMER_FREQ[4] = {4096, 262144, 65536, 16384};
-    const uint16_t TIMER_CONTROL_MEM_ADDR = 0xff07;
-    const uint16_t TIMER_INTERUPT_PTR_ADDR = 0xff06;
+    const uint16_t TIMA_TIMER_COUNTER_ADDRESS = 0xff05;
+    const uint16_t TMA_TIMER_INTERUPT_MODULO_ADDRESS = 0xff06;
+    const uint16_t TAC_TIMER_CONTROL_MEM_ADDRESS = 0xff07;
+    const uint16_t TIMER_INTERUPT_PTR_ADDR = 0x0050;
 
     // Registers
     //  Accumulator
