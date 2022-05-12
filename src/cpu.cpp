@@ -178,8 +178,8 @@ void CPU::tick() {
         }
     }
     
-    if (this->get_timer_state())
-        this->increment_timer();
+//    if (this->get_timer_state())
+    this->increment_timer();
     
     // Check for interupts if internal state is true
     if (this->interupt_state == this->INTERUPT_STATE::ENABLED ||
@@ -289,8 +289,8 @@ void CPU::increment_timer()
 {
     unsigned int freq = this->TIMER_FREQ[this->ram->get_val(this->TAC_TIMER_CONTROL_MEM_ADDRESS) & 0x03];
     this->timer_itx ++;
-    std::cout << "INcrmeenting timer!" << std::endl;
-    // If CPU count since last tick is greater/equal to CPU frequency/timer frequency
+//    std::cout << "INcrmeenting timer!" << std::endl;
+//    // If CPU count since last tick is greater/equal to CPU frequency/timer frequency
     // increment timer in mem
     if (this->timer_itx >= (this->CPU_FREQ / freq))
     {
@@ -299,7 +299,7 @@ void CPU::increment_timer()
         //std::cout << "Timer tick!" << std::endl;
         
         // Check if timer overflowed
-        if (this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
+        if (this->get_timer_state() && this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
         {
             // Set timer interupt
             this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 3, 1);
