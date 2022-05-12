@@ -2702,7 +2702,13 @@ void CPU::op_Load(reg16 *dest) {
 
 }
 void CPU::opm_Load(uint16_t dest_addr, reg16 *source) {
-    this->ram->set(dest_addr, source->get_value());
+    // Obtain 2-byte source value
+    this->data_conv.bit16[0] = source->get_value();
+
+    // Set MS-byte into first address
+    this->ram->set(dest_addr, this->data_conv.bit8[1]);
+    // Set LS-byte into following address
+    this->ram->set(dest_addr + 1, this->data_conv.bit8[0]);
 }
 // Copy 1 byte between registers
 void CPU::op_Load(reg8 *dest, reg8 *source) {
