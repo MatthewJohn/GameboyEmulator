@@ -44,7 +44,10 @@
 //#define STEPIN_AFTER 0x2ca370
 #define DEBUG_EVERY 1//1//x200
 
+// Debug all new op codes
 #define DEBUG_OP_CODES false
+// Debug single op code
+#define DEBUG_SINGLE_OP_CODE 0
 
 // Look for FFC3 set to 7f
 //x98
@@ -222,7 +225,7 @@ void CPU::tick() {
     // Read value from memory, incrementing PC
     this->op_val = (unsigned int)this->get_inc_pc_val8();
 
-    if (DEBUG_OP_CODES || this->op_val == 0x08 || this->stepped_in || DEBUG)
+    if (DEBUG_OP_CODES || (DEBUG_SINGLE_OP_CODE != 0x00 && this->op_val == DEBUG_SINGLE_OP_CODE) || this->stepped_in || DEBUG)
         this->debug_op_codes(this->op_val);
 
     if (this->cb_state) {
