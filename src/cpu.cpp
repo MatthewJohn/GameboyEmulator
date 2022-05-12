@@ -26,20 +26,25 @@
 //#define STEPIN 0x0101
 //#define STEPIN 0x07f2
 //#define STEPIN 0x00//x0217//x075b
-#define STEPIN 0//0xc781//0x00//0x100
+// Step-in when SP points to this adress
+#define STEPIN 0//0xc66f//0xc781//0x00//0x100
 
 //#define STEPIN 0 //0x06ef //0x0271 //0x029d
+// Debug all calls when PC is over this value
 #define DEBUG_POINT 0//xc4a0//x02b7//x086f//x086f//x0870
 //0x086e //0x086f//0x02bd//0x0291 //0x26c
 // 0x9c9d19
 //#define STEPIN_AFTER 0x9c9bca
 
 // AF should be 10a0 PC: 086e
-#define STEPIN_AFTER 0//x2f1000//x308ac0//x2e8a00(write to 2000)//x2C3D70//2c2c85//0x2cf51d//0x39a378//0x9c9d68//0x2ca378
+// Stepin after X CPU ticks
+#define STEPIN_AFTER 0x00//x2f1000//x308ac0//x2e8a00(write to 2000)//x2C3D70//2c2c85//0x2cf51d//0x39a378//0x9c9d68//0x2ca378
+// Print debug every X cpu ticks
 //#define STEPIN_AFTER 0x2ca380
 //#define STEPIN_AFTER 0x2ca370
-#define DEBUG_EVERY 1//x200
+#define DEBUG_EVERY 1//1//x200
 
+#define DEBUG_OP_CODES false
 
 // Look for FFC3 set to 7f
 //x98
@@ -217,7 +222,7 @@ void CPU::tick() {
     // Read value from memory, incrementing PC
     this->op_val = (unsigned int)this->get_inc_pc_val8();
 
-    if (this->stepped_in || DEBUG)
+    if (DEBUG_OP_CODES || this->op_val == 0x08 || this->stepped_in || DEBUG)
         this->debug_op_codes(this->op_val);
 
     if (this->cb_state) {
