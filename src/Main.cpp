@@ -69,8 +69,8 @@ int main(int argc, char* args[])
     // 03-op sp,hl.gb - hangs
     // 04-op r,imm.gb - passed
     // 05-op rp.gb - passed
-    // 06-ld r,r.gb - pased
-    // 07-jr,jp,call,ret,rst.gb - hangs
+    // 06-ld r,r.gb - passed
+    // 07-jr,jp,call,ret,rst.gb - passed!
     // 08-misc instrs.gb
     // 09-op r,r.gb - passed
     // 10-bit ops.gb - passed
