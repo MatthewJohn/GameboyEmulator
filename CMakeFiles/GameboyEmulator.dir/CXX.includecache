@@ -24,22 +24,6 @@ signal.h
 ./test_runner.h
 /home/matthew/w/g/gameboy-emulator/src/test_runner.h
 
-/home/matthew/w/g/gameboy-emulator/src/cpu.cpp
-cpu.h
-/home/matthew/w/g/gameboy-emulator/src/cpu.h
-helper.h
-/home/matthew/w/g/gameboy-emulator/src/helper.h
-iomanip
--
-iostream
--
-string.h
--
-algorithm
--
-iterator
--
-
 /home/matthew/w/g/gameboy-emulator/src/cpu.h
 memory
 -
@@ -53,20 +37,6 @@ iostream
 -
 ios
 -
-
-/home/matthew/w/g/gameboy-emulator/src/ram.cpp
-iostream
--
-fstream
--
-cstring
--
-signal.h
--
-helper.h
-/home/matthew/w/g/gameboy-emulator/src/helper.h
-ram.h
-/home/matthew/w/g/gameboy-emulator/src/ram.h
 
 /home/matthew/w/g/gameboy-emulator/src/ram.h
 memory
@@ -87,18 +57,6 @@ iostream
 /home/matthew/w/g/gameboy-emulator/src/cpu.h
 ./vpu.h
 /home/matthew/w/g/gameboy-emulator/src/vpu.h
-
-/home/matthew/w/g/gameboy-emulator/src/vpu.cpp
-vpu.h
-/home/matthew/w/g/gameboy-emulator/src/vpu.h
-helper.h
-/home/matthew/w/g/gameboy-emulator/src/helper.h
-iostream
--
-unistd.h
--
-memory
--
 
 /home/matthew/w/g/gameboy-emulator/src/vpu.h
 memory
