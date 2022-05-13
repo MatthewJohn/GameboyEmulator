@@ -80,7 +80,7 @@ void VPU::update_mode_flag()
     else if (this->get_lx() < this->MODE2_LENGTH)
     {
         this->current_mode = this->MODE::MODE2;
-        this->mode_timer_itx = this-get_lx();
+        this->mode_timer_itx = this->get_lx();
         // Set bit 0+1 to 2
         mode = 0x02;
     }
@@ -88,7 +88,7 @@ void VPU::update_mode_flag()
     else if (this->get_lx() < (this->MODE2_LENGTH + this->MODE3_LENGTH))
     {
         this->current_mode = this->MODE::MODE3;
-        this->mode_timer_itx = this-get_lx() - this->MODE2_LENGTH;
+        this->mode_timer_itx = this->get_lx() - this->MODE2_LENGTH;
         // Set bits 0+1 to 3
         mode = 0x03;
     }
@@ -107,7 +107,7 @@ void VPU::update_mode_flag()
         mode |= 0x04;
     }
 
-    uint8 current_mode = this->ram->get_val(this->ram->LCDC_STATUS_ADDR);
+    uint8_t current_mode = this->ram->get_val(this->ram->LCDC_STATUS_ADDR);
     
     // Blank out bits 0-2
     current_mode &= 0x07;
@@ -146,7 +146,7 @@ void VPU::increment_lx_ly()
 
 void VPU::trigger_stat_interrupt()
 {
-    this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 1, 1U);
+    this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 1, 1U);
 }
 
 
@@ -166,7 +166,7 @@ void VPU::tick() {
     if (this->current_mode == this->MODE::MODE2)
     {
         // Check for interrupts
-        if (this=>mode_timer_itx == 0)
+        if (this->mode_timer_itx == 0)
         {
             // Since this is the first mode for a line draw line,
             // check LYC=LY coincide interrupt
@@ -202,7 +202,7 @@ void VPU::tick() {
     else if (this->current_mode == this->MODE::MODE0)
     {
         // Check if STAT interupt should be set on first tick
-        if (this=>mode_timer_itx == 0 &&
+        if (this->mode_timer_itx == 0 &&
             this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 3) == 1)
         {
             this->trigger_stat_interrupt();
@@ -215,7 +215,7 @@ void VPU::tick() {
         if (this->mode_timer_itx == 0)
         {
             // Trigger v-blank interupt
-            this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 0, 1U);
+            this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0, 1U);
 
             // Check if STAT interupt should be set on first tick
             if (this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 4) == 1)

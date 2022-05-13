@@ -309,7 +309,7 @@ void CPU::increment_timer()
         if (this->get_timer_state() && this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
         {
             // Set timer interupt
-            this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 3, 1);
+            this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 3, 1);
             // Reset counter value back to moduli
             this->ram->set(
                 this->TIMA_TIMER_COUNTER_ADDRESS,
@@ -342,11 +342,11 @@ void CPU::print_state_m() {
 void CPU::check_interupts() {
 
     // Check if VLBANK has been triggered and interupt is enabled
-    if (this->ram->get_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 0) &&
-        this->ram->get_ram_bit(this->INTERUPT_IE_REGISTER_ADDRESS, 0))
+    if (this->ram->get_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0) &&
+        this->ram->get_ram_bit(this->ram->INTERUPT_IE_REGISTER_ADDRESS, 0))
     {
         // Reset interupt user interupt bit
-        this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 0, 0);
+        this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0, 0);
 
         // If interupt state is either enabled or pending disable,
         // jump to interupt address
@@ -398,11 +398,11 @@ void CPU::check_interupts() {
     }
 
     // Check if timer has been triggered and interupt is enabled
-    if (this->ram->get_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 2) &&
-        this->ram->get_ram_bit(this->INTERUPT_IE_REGISTER_ADDRESS, 2))
+    if (this->ram->get_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 2) &&
+        this->ram->get_ram_bit(this->ram->INTERUPT_IE_REGISTER_ADDRESS, 2))
     {
         // Reset interupt user interupt bit
-        this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 3, 0);
+        this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 3, 0);
 
         // If interupt state is either enabled or pending disable,
         // jump to interupt address
