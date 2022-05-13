@@ -38,7 +38,7 @@
 
 // AF should be 10a0 PC: 086e
 // Stepin after X CPU ticks
-#define STEPIN_AFTER 0x1c06a7d//x2f1000//x308ac0//x2e8a00(write to 2000)//x2C3D70//2c2c85//0x2cf51d//0x39a378//0x9c9d68//0x2ca378
+#define STEPIN_AFTER 0//0x1c06a7d//x2f1000//x308ac0//x2e8a00(write to 2000)//x2C3D70//2c2c85//0x2cf51d//0x39a378//0x9c9d68//0x2ca378
 // Print debug every X cpu ticks
 //#define STEPIN_AFTER 0x2ca380
 //#define STEPIN_AFTER 0x2ca370

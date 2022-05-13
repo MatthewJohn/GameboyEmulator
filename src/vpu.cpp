@@ -151,11 +151,8 @@ void VPU::trigger_stat_interrupt()
 
 
 
-void VPU::tick() {
-
-    // Handle events
-    this->process_events();
-
+void VPU::tick()
+{
     // Increment lx
     this->increment_lx_ly();
 
@@ -201,6 +198,11 @@ void VPU::tick() {
     }
     else if (this->current_mode == this->MODE::MODE0)
     {
+        // Handle events at beginning of h-blank
+        if (this->mode_timer_itx == 0)
+            // Handle events
+            this->process_events();
+
         // Check if STAT interupt should be set on first tick
         if (this->mode_timer_itx == 0 &&
             this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 3) == 1)
