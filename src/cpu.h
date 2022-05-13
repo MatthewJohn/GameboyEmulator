@@ -65,6 +65,7 @@ public:
     void tick();
     bool is_running();
     void reset_state();
+    int get_tick_counter();
     //void print_state();
 protected:
     enum INTERUPT_STATE {

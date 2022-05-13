@@ -25,6 +25,8 @@ public:
     void tick();
     void tear_down();
     void process_events();
+    void capture_screenshot(char* file_path);
+
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Event event;

@@ -163,6 +163,11 @@ bool CPU::is_running() {
     return this->running;
 }
 
+int CPU::get_tick_counter()
+{
+    return this->tick_counter;
+}
+
 void CPU::tick() {
     this->tick_counter ++;
 
