@@ -25,11 +25,14 @@ VPU::VPU(RAM *ram) {
     SDL_CreateWindowAndRenderer(this->SCREEN_HEIGHT, this->SCREEN_WIDTH, 0, &this->window, &this->renderer);
 
 
-    this->h_timer_itx = 0;
-    this->refresh_timer_itx = 0;
+    this->mode_timer_itx = 0;
+
     // Reset current line
-    this->ram->v_set(this->ram->LCDC_LY_ADDR, 0x00);
-    this->current_pixel_x = 0;
+    this->ram->set(this->ram->LCDC_LY_ADDR, 0x00);
+    this->current_lx = 0;
+
+    // Reset control address value
+    this->ram->set(this->ram->LCDC_CONTROL_ADDR, 0x91);
 
 	//Create Window
 
@@ -58,67 +61,171 @@ void VPU::process_events() {
 
 // VPU ticks happen at ~ 4213440Hz - 4.213KHz
 // CPU ticks will be limited to 1MHz
-void VPU::update_mode_flag() {
-    uint8_t mode = this->get_mode_flag_value();
-    this->ram->set_ram_bit(this->ram->LCDC_STATUS_ADDR, 0x0, (mode & 0x1));
-    this->ram->set_ram_bit(this->ram->LCDC_STATUS_ADDR, 0x1, (mode & 0x2));
-}
-uint8_t VPU::get_mode_flag_value() {
-    if (! this->lcd_enabled())
-        return 0x1;
-    if (this->get_current_y() > this->SCREEN_HEIGHT)
-        return 0x1;
-    if (this->get_current_x() > this->SCREEN_WIDTH)
-        return 0x0;
-    return 0x3;
-}
-
-void VPU::reset_ly() {
-    this->process_events();
-    if (DEBUG)
-        std::cout << "NEXT SCREEN" << std::endl;
-
-    // Reset current line
-    this->ram->v_set(this->ram->LCDC_LY_ADDR, 0x00);
-}
-
-void VPU::reset_lx() {
-    this->process_events();
-    this->current_pixel_x = 0;
-    uint8_t current_y = this->ram->v_inc(this->ram->LCDC_LY_ADDR);
-    if (current_y == this->ram->get_val(this->ram->LCDC_LYC_ADDR))
-        this->ram->set_ram_bit(this->ram->LCDC_STATUS_ADDR, 2, 1U);
-    else
-        this->ram->set_ram_bit(this->ram->LCDC_STATUS_ADDR, 2, 0U);
-}
-
-void VPU::tick() {
-
-    // Check X position
-    this->current_pixel_x ++;
-    if (this->get_current_x() >= this->MAX_LX)
-        this->reset_lx();
-    uint8_t current_y = this->get_current_y();
-
-    // Check if LY counter is the max value
-    // and reset
-    if (current_y >= this->MAX_LY)
+void VPU::update_mode_flag()
+{
+    uint8_t mode;
+    // Check for v-blank - since ly starts at 0 and screen height starts at
+    // 1, check greater than or equal to
+    if (this->get_ly() >= this->SCREEN_HEIGHT)
     {
-        this->reset_ly();
-        current_y = 0;
+        this->current_mode = this->MODE::MODE1;
+        
+        // Set mode timer from start of blank (x * y since vblank start)
+        this->mode_timer_itx = ((this->get_ly() - this->SCREEN_HEIGHT) * SCREEN_WIDTH) + this->get_lx();
+
+        // Set bit 0+1 to 1
+        mode = 0x01;
+    }
+    // Check for OAM transfer
+    else if (this->get_lx() < this->MODE2_LENGTH)
+    {
+        this->current_mode = this->MODE::MODE2;
+        this->mode_timer_itx = this->get_lx();
+        // Set bit 0+1 to 2
+        mode = 0x02;
+    }
+    // Check for LCD transfer
+    else if (this->get_lx() < (this->MODE2_LENGTH + this->MODE3_LENGTH))
+    {
+        this->current_mode = this->MODE::MODE3;
+        this->mode_timer_itx = this->get_lx() - this->MODE2_LENGTH;
+        // Set bits 0+1 to 3
+        mode = 0x03;
+    }
+    // Default to H-blank
+    else
+    {
+        this->current_mode = this->MODE::MODE0;
+        this->mode_timer_itx = this->get_lx() - (this->MODE2_LENGTH + this->MODE3_LENGTH);
+        // Set bits 0+1 to 0
+        mode = 0x00;
+    }
+    
+    if (this->get_ly() == this->ram->get_val(this->ram->LCDC_LYC_ADDR))
+    {
+        // Set bit 2
+        mode |= 0x04;
     }
 
-    // Update timers and skip to next screen,
-    // if required.
+    uint8_t current_mode = this->ram->get_val(this->ram->LCDC_STATUS_ADDR);
+    
+    // Blank out bits 0-2
+    current_mode &= 0x07;
+    
+    // Combine new mode flags with remainder of original flag
+    current_mode |= mode;
+    
+    this->ram->set(this->ram->LCDC_STATUS_ADDR, current_mode);
+}
+
+void VPU::increment_lx_ly()
+{
+    if (this->current_lx == this->MAX_LX)
+    {
+        this->current_lx = 0;
+        // If LX 'overflowed', increment
+        // LY
+        uint8_t new_ly = this->get_ly();
+        if (new_ly == this->MAX_LY)
+        {
+            new_ly = 0;
+            if (DEBUG)
+                std::cout << "NEXT SCREEN CYCLE" << std::endl;
+        }
+        else
+        {
+            new_ly ++;
+        }
+        this->ram->set(this->ram->LCDC_LY_ADDR, new_ly);
+    }
+    else
+    {
+        this->current_lx ++;
+    }
+}
+
+void VPU::trigger_stat_interrupt()
+{
+    this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 1, 1U);
+}
+
+
+
+void VPU::tick()
+{
+    // Increment lx
+    this->increment_lx_ly();
+
     this->update_mode_flag();
 
-    // Check if LCD is enabled
-    if (! this->lcd_enabled())
-        return;
 
-    // If not at end of screen, in either x or y, process pixel
-    if (current_y <= this->SCREEN_HEIGHT && this->get_current_x() < this->SCREEN_WIDTH)
-        this->process_pixel();
+    // Check current mode
+    if (this->current_mode == this->MODE::MODE2)
+    {
+        // Check for interrupts
+        if (this->mode_timer_itx == 0)
+        {
+            // Since this is the first mode for a line draw line,
+            // check LYC=LY coincide interrupt
+            if (this->get_ly() == this->ram->get_val(this->ram->LCDC_LYC_ADDR) &&
+                this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 6) == 1)
+            {
+                this->trigger_stat_interrupt();
+            }
+
+            // Check if STAT interupt should be set on first tick
+            if (this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 5) == 1)
+            {
+                this->trigger_stat_interrupt();
+            }
+        }
+
+        // Do nothing
+        // In future, deal with OAM 
+    }
+    else if (this->current_mode == this->MODE::MODE3)
+    {
+        // Check if LCD is enabled
+        if (! this->lcd_enabled())
+            return;
+
+        // Draw pixels
+        if (this->mode_timer_itx < this->SCREEN_WIDTH)
+        {
+            this->current_draw_pixel = this->mode_timer_itx;
+            this->process_pixel();
+        }
+    }
+    else if (this->current_mode == this->MODE::MODE0)
+    {
+        // Handle events at beginning of h-blank
+        if (this->mode_timer_itx == 0)
+            // Handle events
+            this->process_events();
+
+        // Check if STAT interupt should be set on first tick
+        if (this->mode_timer_itx == 0 &&
+            this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 3) == 1)
+        {
+            this->trigger_stat_interrupt();
+        }
+        // Do nothing in h-blank
+    }
+    else if (this->current_mode == this->MODE::MODE1)
+    {
+        // If timer is at 0, check for interrupts
+        if (this->mode_timer_itx == 0)
+        {
+            // Trigger v-blank interupt
+            this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0, 1U);
+
+            // Check if STAT interupt should be set on first tick
+            if (this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 4) == 1)
+            {
+                this->trigger_stat_interrupt();
+            }
+        }
+    }
 }
 
 uint8_t VPU::get_background_scroll_y() {
@@ -142,8 +249,8 @@ uint8_t VPU::get_background_data_type() {
 
 vec_2d VPU::get_pixel_tile_position() {
     vec_2d pos;
-    pos.x = ((unsigned int)((unsigned int)this->get_background_scroll_x() + (unsigned int)this->get_current_x()) % (this->TILE_WIDTH * this->BACKGROUND_TILE_GRID_WIDTH)) % this->TILE_WIDTH;
-    pos.y = (((unsigned int)this->get_background_scroll_y() + (unsigned int)this->get_current_y())  %(this->TILE_HEIGHT * this->BACKGROUND_TILE_GRID_HEIGHT)) % this->TILE_HEIGHT;
+    pos.x = ((unsigned int)((unsigned int)this->get_background_scroll_x() + (unsigned int)this->current_draw_pixel) % (this->TILE_WIDTH * this->BACKGROUND_TILE_GRID_WIDTH)) % this->TILE_WIDTH;
+    pos.y = (((unsigned int)this->get_background_scroll_y() + (unsigned int)this->get_ly())  %(this->TILE_HEIGHT * this->BACKGROUND_TILE_GRID_HEIGHT)) % this->TILE_HEIGHT;
     return pos;
 }
 
@@ -176,7 +283,7 @@ uint8_t VPU::get_pixel_color() {
             " tile x pos: " << pos.x << std::endl <<
             " bit1: " << (unsigned int)((byte1 >> byte_index) & (uint8_t)(0x01)) <<
             " bit2: " << (unsigned int)((byte2 >> byte_index) & (uint8_t)(0x01) << 1) <<
-            "  x: " << (unsigned int)this->get_current_x() << ", y: " << (unsigned int)this->get_current_y() << std::endl <<
+            "  x: " << (unsigned int)this->current_draw_pixel << ", y: " << (unsigned int)this->get_ly() << std::endl <<
             " colour byte: " << (unsigned int)colour_byte <<
             " tile index: " << byte_index <<
             " Tile data location " << this->get_tile_data_address(this->ram->get_val(this->get_current_map_address())) <<
@@ -219,18 +326,18 @@ void VPU::process_pixel() {
             SDL_SetRenderDrawColor(renderer, 255, 0, 128, 0);
             //std::cout << std::hex << "Unknown color: " << (unsigned int)color << std::endl;
     };
-    SDL_RenderDrawPoint(this->renderer, (int)this->get_current_x(), (int)this->get_current_y());
+    SDL_RenderDrawPoint(this->renderer, (int)this->current_draw_pixel, (int)this->get_ly());
     //this->process_events();
     //if (DEBUG && color != 0x0)
-    //    std::cout << std::hex << "Setting Pixel color: " << (unsigned int)this->get_current_x() << " " << (unsigned int)this->get_current_y() << " " << (int)color << std::endl;
+    //    std::cout << std::hex << "Setting Pixel color: " << (unsigned int)this->current_draw_pixel << " " << (unsigned int)this->get_ly() << " " << (int)color << std::endl;
 }
 
 // Return the on-screen X coornidate of the pixel being drawn
-uint8_t VPU::get_current_x() {
-    return this->current_pixel_x;
+uint8_t VPU::get_lx() {
+    return this->current_lx;
 }
 // Return the on-screen X coornidate of the pixel being drawn
-uint8_t VPU::get_current_y() {
+uint8_t VPU::get_ly() {
     return this->ram->get_val(this->ram->LCDC_LY_ADDR);
 }
 
@@ -244,12 +351,12 @@ uint8_t convert_int8_uint8(uint8_t in_val) {
 }
 
 unsigned int VPU::get_tile_map_index_from_current_coord() {
-    //if (this->get_current_x() == 0)
+    //if (this->current_draw_pixel() == 0)
     //    std::cout << (unsigned int)this->VRAM_BG_MAPS[this->get_background_map()] << std::endl;
     unsigned int bgs_y = (unsigned int)this->get_background_scroll_y();
     unsigned int bgs_x = (unsigned int)this->get_background_scroll_x();
-    unsigned int y = (unsigned int)this->get_current_y();
-    unsigned int x = (unsigned int)this->get_current_x();
+    unsigned int y = (unsigned int)this->get_ly();
+    unsigned int x = (unsigned int)this->current_draw_pixel;
     return (unsigned int)(((((bgs_y + y) % (this->TILE_HEIGHT * this->BACKGROUND_TILE_GRID_HEIGHT)) / this->TILE_HEIGHT) * this->BACKGROUND_TILE_GRID_WIDTH) +
                           (((bgs_x + x) % (this->TILE_WIDTH * this->BACKGROUND_TILE_GRID_WIDTH)) / this->TILE_WIDTH));
 }

@@ -105,9 +105,10 @@ protected:
 
     const int CPU_FREQ = 4000000;
 
-    // Interupts
-    const uint16_t INTERUPT_IF_REGISTER_ADDRESS = 0xff0f;
-    const uint16_t INTERUPT_IE_REGISTER_ADDRESS = 0xffff;
+    // Interupts  
+    const uint16_t VBLANK_INTERUPT_PTR_ADDR = 0x0040;
+    
+    const uint16_t LCDC_STATUS_INTERUPT_PTR_ADDR = 0x0048;
 
     // Timer config
     const int TIMER_FREQ[4] = {4096, 262144, 65536, 16384};

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CodeLite_Workspace Name="GameboyEmulator" Version="10.0.0">
-  <Project Name="GameboyEmulator" Path="GameboyEmulator.project" Active="Yes"/>
-  <BuildMatrix>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
-      <Project Name="GameboyEmulator" ConfigName="Release"/>
-    </WorkspaceConfiguration>
-  </BuildMatrix>
+<CodeLite_Workspace Name="GameboyEmulator">
+	<Project Name="GameboyEmulator" Path="GameboyEmulator.project" Active="No"/>
+	<BuildMatrix>
+		<WorkspaceConfiguration Name="Release" Selected="yes">
+			<Project Name="GameboyEmulator" ConfigName="Release"/>
+		</WorkspaceConfiguration>
+	</BuildMatrix>
 </CodeLite_Workspace>

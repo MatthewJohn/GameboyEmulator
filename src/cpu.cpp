@@ -38,7 +38,7 @@
 
 // AF should be 10a0 PC: 086e
 // Stepin after X CPU ticks
-#define STEPIN_AFTER 0x00//x2f1000//x308ac0//x2e8a00(write to 2000)//x2C3D70//2c2c85//0x2cf51d//0x39a378//0x9c9d68//0x2ca378
+#define STEPIN_AFTER 0//0x1c06a7d//x2f1000//x308ac0//x2e8a00(write to 2000)//x2C3D70//2c2c85//0x2cf51d//0x39a378//0x9c9d68//0x2ca378
 // Print debug every X cpu ticks
 //#define STEPIN_AFTER 0x2ca380
 //#define STEPIN_AFTER 0x2ca370
@@ -47,7 +47,7 @@
 // Debug all new op codes
 #define DEBUG_OP_CODES false
 // Debug single op code
-#define DEBUG_SINGLE_OP_CODE 0
+#define DEBUG_SINGLE_OP_CODE 0xd9
 
 // Look for FFC3 set to 7f
 //x98
@@ -133,7 +133,6 @@ void CPU::reset_state()
     this->r_l.set_value(0);
 
     this->h_blank_executed = false;
-    this->v_blank_executed = false;
 
     this->cb_state = false;
     this->timer_itx = 0;
@@ -310,7 +309,7 @@ void CPU::increment_timer()
         if (this->get_timer_state() && this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
         {
             // Set timer interupt
-            this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 3, 1);
+            this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 3, 1);
             // Reset counter value back to moduli
             this->ram->set(
                 this->TIMA_TIMER_COUNTER_ADDRESS,
@@ -341,35 +340,39 @@ void CPU::print_state_m() {
 }
 
 void CPU::check_interupts() {
+
+    // Check if VLBANK has been triggered and interupt is enabled
+    if (this->ram->get_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0) &&
+        this->ram->get_ram_bit(this->ram->INTERUPT_IE_REGISTER_ADDRESS, 0))
+    {
+        // Reset interupt user interupt bit
+        this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0, 0);
+
+        // If interupt state is either enabled or pending disable,
+        // jump to interupt address
+        if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
+        {
+            if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
+                std::cout << "Got VLBANK INTERUPT!" << std::endl;
+
+            // Push current pointer to stack and update PC to
+            // interupt address
+            this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
+            this->r_pc.set_value(this->ram->get_val(this->VBLANK_INTERUPT_PTR_ADDR));
+            
+            // Do not process any more interupts
+            return;
+        }
+    }
+
+        
+        
+        
     // If interupt state is either enabled or pending disable,
     // check interupts
     if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
     {
-        // Check VPU V-Blank interupt
-        if ((this->ram->get_val(this->ram->LCDC_STATUS_ADDR) & (uint8_t)0x11))
-        {
-            if (! this->v_blank_executed)
-            {
-                if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
-                    std::cout << std::hex << "Got v-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
-
-                // Store PC on the stack
-                this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-                // Jump to 0x0040
-                this->r_pc.set_value((uint8_t)0x0040);
-                
-                // Mark interupt for h_blank as being executed
-                this->v_blank_executed = true;
-                
-                // Return to ensure no other interupts are processed.
-                return;
-            }
-        }
-        else
-        {
-            this->v_blank_executed = false;
-        }
-
+        // LCD status interupt
         if ((this->ram->get_val(this->ram->LCDC_STATUS_ADDR) & (uint8_t)0x08))
         {
             if (! this->h_blank_executed)
@@ -378,7 +381,7 @@ void CPU::check_interupts() {
                     std::cout << std::hex << "Got h-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
 
                 // Do a straight jump to 0x0048
-                this->r_pc.set_value((uint8_t)0x0048);
+                this->r_pc.set_value(this->LCDC_STATUS_INTERUPT_PTR_ADDR);
             
                 // Mark interupt for h_blank as being executed
                 this->h_blank_executed = true;
@@ -395,11 +398,11 @@ void CPU::check_interupts() {
     }
 
     // Check if timer has been triggered and interupt is enabled
-    if (this->ram->get_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 2) &&
-        this->ram->get_ram_bit(this->INTERUPT_IE_REGISTER_ADDRESS, 2))
+    if (this->ram->get_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 2) &&
+        this->ram->get_ram_bit(this->ram->INTERUPT_IE_REGISTER_ADDRESS, 2))
     {
         // Reset interupt user interupt bit
-        this->ram->set_ram_bit(this->INTERUPT_IF_REGISTER_ADDRESS, 3, 0);
+        this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 3, 0);
 
         // If interupt state is either enabled or pending disable,
         // jump to interupt address

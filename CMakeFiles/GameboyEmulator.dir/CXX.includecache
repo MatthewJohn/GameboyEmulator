@@ -6,21 +6,23 @@
 
 #IncludeRegexTransform: 
 
-/home/matthew/w/g/gameboy-emulator/src/cpu.cpp
-cpu.h
-/home/matthew/w/g/gameboy-emulator/src/cpu.h
-helper.h
-/home/matthew/w/g/gameboy-emulator/src/helper.h
-iomanip
--
+/home/matthew/w/g/gameboy-emulator/src/Main.cpp
 iostream
 -
-string.h
+string
 -
-algorithm
+signal.h
 -
-iterator
--
+./helper.h
+/home/matthew/w/g/gameboy-emulator/src/helper.h
+./ram.h
+/home/matthew/w/g/gameboy-emulator/src/ram.h
+./vpu.h
+/home/matthew/w/g/gameboy-emulator/src/vpu.h
+./cpu.h
+/home/matthew/w/g/gameboy-emulator/src/cpu.h
+./test_runner.h
+/home/matthew/w/g/gameboy-emulator/src/test_runner.h
 
 /home/matthew/w/g/gameboy-emulator/src/cpu.h
 memory
@@ -45,6 +47,16 @@ ram_subset.h
 /home/matthew/w/g/gameboy-emulator/src/ram_subset.h
 memory
 -
+
+/home/matthew/w/g/gameboy-emulator/src/test_runner.h
+iostream
+-
+./ram.h
+/home/matthew/w/g/gameboy-emulator/src/ram.h
+./cpu.h
+/home/matthew/w/g/gameboy-emulator/src/cpu.h
+./vpu.h
+/home/matthew/w/g/gameboy-emulator/src/vpu.h
 
 /home/matthew/w/g/gameboy-emulator/src/vpu.h
 memory

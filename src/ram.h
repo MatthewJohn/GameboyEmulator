@@ -53,6 +53,10 @@ public:
     const uint16_t LCDC_LYC_ADDR     = (uint16_t)0xff45; // Custom location for interupt if LY equals this
     const uint16_t LCDC_WY_ADDR      = (uint16_t)0xff4a; // Window y position
     const uint16_t LCDC_WX_ADDR      = (uint16_t)0xff4b; // Window x position
+    
+        // Interupts
+    const uint16_t INTERUPT_IF_REGISTER_ADDRESS = 0xff0f; // Flags to determine that interrupt has occurred
+    const uint16_t INTERUPT_IE_REGISTER_ADDRESS = 0xffff; // Interupt enable flags for different types of interrupts
 
 private:
     // @TODO Reduce this to exclude mappings to other
