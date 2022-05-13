@@ -125,8 +125,8 @@ void VPU::increment_lx_ly()
         this->current_lx = 0;
         // If LX 'overflowed', increment
         // LY
-        uint8_t new_ly;
-        if (this->get_ly() == this->MAX_LY)
+        uint8_t new_ly = this->get_ly();
+        if (new_ly == this->MAX_LY)
         {
             new_ly = 0;
             if (DEBUG)
