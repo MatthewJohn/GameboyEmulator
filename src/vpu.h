@@ -72,6 +72,8 @@ private:
     const unsigned int TILE_DATA_SIZE = 16;
 
     void increment_lx_ly();
+    
+    void trigger_stat_interrupt();
 
     RAM *ram;
 
