@@ -47,7 +47,7 @@
 // Debug all new op codes
 #define DEBUG_OP_CODES false
 // Debug single op code
-#define DEBUG_SINGLE_OP_CODE 0xd9
+#define DEBUG_SINGLE_OP_CODE 0x0
 
 // Look for FFC3 set to 7f
 //x98
