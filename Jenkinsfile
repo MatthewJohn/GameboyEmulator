@@ -5,8 +5,9 @@ pipeline {
     stages {
         stage('build') {
             steps {
+                sh 'rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake'
                 sh 'cmake .'
-                sh 'make all'
+                sh 'make clean all'
                 stash includes: 'GameboyEmulator', name: 'app'
             }
         }
