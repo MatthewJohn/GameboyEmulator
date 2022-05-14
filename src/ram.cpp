@@ -154,7 +154,8 @@ RamSubset RAM::get_high_ram() {
 
 void RAM::load_bios(arguments_t *arguments) {
     // Open file
-    std::ifstream infile(arguments->bios_path, std::ios::binary);
+    char *bios_path = arguments->bios_path;
+    std::ifstream infile(bios_path, std::ios::binary);
 
     // Iterate through bytes in file and store in memory
     size_t addr = 0;

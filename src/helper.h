@@ -17,11 +17,13 @@ private:
     static std::ios_base::fmtflags RESET_FLAGS;
 };
 
+#define PATH_SIZE 4096
+
 struct arguments_t
 {
-    char *bios_path;
-    char *rom_path;
-    char *screenshot_path;
+    char bios_path[PATH_SIZE];
+    char rom_path[PATH_SIZE];
+    char screenshot_path[PATH_SIZE];
     int screenshot_ticks;
 };
 

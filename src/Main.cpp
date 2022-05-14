@@ -19,12 +19,10 @@
 #define RUN_TESTS 0
 #define DISABLE_VPU 0
 
-#define PATH_SIZE 4096
-
 
 int main(int argc, char *args[])
 {
-    arguments_t arguments = {nullptr, nullptr, nullptr, 0};
+    arguments_t arguments = {0, 0, 0, 0};
 
 
     for(;;)
@@ -38,16 +36,13 @@ int main(int argc, char *args[])
         switch(getopt(argc, args, "hf:b:s:t:"))
         {
             case 'f':
-                arguments.rom_path = (char*)malloc(sizeof(optarg));
-                strcpy(arguments.rom_path, optarg);
+                strncpy(arguments.rom_path, optarg, sizeof(arguments.rom_path) - 1);
                 continue;
             case 'b':
-                arguments.bios_path = (char*)malloc(sizeof(optarg));
-                strcpy(arguments.bios_path, optarg);
+                strncpy(arguments.bios_path, optarg, sizeof(arguments.bios_path) - 1);
                 continue;
             case 's':
-                arguments.screenshot_path = (char*)malloc(sizeof(optarg));
-                strcpy(arguments.screenshot_path, optarg);
+                strncpy(arguments.screenshot_path, optarg, sizeof(arguments.screenshot_path) - 1);
                 continue;
             case 't':
                 arguments.screenshot_ticks = atoi(optarg);
@@ -81,17 +76,15 @@ int main(int argc, char *args[])
     cpu_inst->reset_state();
 
     // Load bios/RAM
-    if (! arguments.bios_path)
+    if (strlen(arguments.bios_path) == 0)
     {
         char bios_path[] = "./copyright/DMG_ROM.bin";
-        arguments.bios_path = (char*)malloc(sizeof(bios_path));
-        strcpy(arguments.bios_path, bios_path);
+        strncpy(arguments.bios_path, bios_path, sizeof(arguments.bios_path) - 1);
     }
-    if (! arguments.rom_path)
+    if (strlen(arguments.rom_path) == 0)
     {
         char rom_path[] = "./resources/test_roms/cpu_instrs/individual/08-misc instrs.gb";
-        arguments.rom_path = (char*)malloc(sizeof(rom_path));
-        strcpy(arguments.rom_path, rom_path);
+        strncpy(arguments.rom_path, rom_path, sizeof(arguments.rom_path) - 1);
     }
 
     //char bios_path[] = "./matt-test-daa.rom";
