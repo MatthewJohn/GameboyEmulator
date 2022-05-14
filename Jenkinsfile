@@ -21,6 +21,11 @@ pipeline {
               unstash 'app'
               sh 'bash ./tests/system/01-special.sh'
             }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'output.bmp,comparison.jpg', fingerprint: false
+                }
+            }
         }
     }
 }
