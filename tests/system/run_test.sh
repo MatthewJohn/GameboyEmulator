@@ -7,7 +7,7 @@ rom=$1
 timing=$2
 
 # Start display
-Xvfb :99 -screen 0 600x600x32 +extension GLX +render -noreset &
+Xvfb :99 -screen 0 600x600x16 +extension GLX +render -noreset &
 xvfb_pid=$!
 
 # Wait for screen to start
