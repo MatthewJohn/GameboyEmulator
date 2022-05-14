@@ -64,6 +64,7 @@ public:
 
     void tick();
     bool is_running();
+    void stop();
     void reset_state();
     int get_tick_counter();
     //void print_state();

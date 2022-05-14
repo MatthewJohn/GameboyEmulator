@@ -63,8 +63,32 @@ void VPU::capture_screenshot(char* file_path)
     SDL_FreeSurface(sshot);
 }
 
-void VPU::process_events() {
+VpuEventType VPU::process_events() {
     SDL_RenderPresent(this->renderer);
+    
+    // Handle SDL events
+    SDL_Event event;
+    while(SDL_PollEvent(&event) != 0) {
+
+        switch(event.type) {
+            case SDL_WINDOWEVENT:
+                if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
+                    return VpuEventType::EXIT;
+                }
+                break;
+
+            case SDL_QUIT:
+                return VpuEventType::EXIT;
+            
+            // Check for keyboard events
+            case SDL_KEYDOWN:
+                switch(event.key.keysym.sym) {
+                    case SDLK_ESCAPE:
+                        return VpuEventType::EXIT;
+                }
+        }
+    }
+    return VpuEventType::NONE;
 }
 
 // VPU ticks happen at ~ 4213440Hz - 4.213KHz
@@ -159,8 +183,10 @@ void VPU::trigger_stat_interrupt()
 
 
 
-void VPU::tick()
+VpuEventType VPU::tick()
 {
+    VpuEventType return_val = VpuEventType::NONE;
+
     // Increment lx
     this->increment_lx_ly();
 
@@ -195,7 +221,7 @@ void VPU::tick()
     {
         // Check if LCD is enabled
         if (! this->lcd_enabled())
-            return;
+            return return_val;
 
         // Draw pixels
         if (this->mode_timer_itx < this->SCREEN_WIDTH)
@@ -207,9 +233,10 @@ void VPU::tick()
     else if (this->current_mode == this->MODE::MODE0)
     {
         // Handle events at beginning of h-blank
-        if (this->mode_timer_itx == 0)
+        if (this->mode_timer_itx == 0) {
             // Handle events
-            this->process_events();
+            return_val = this->process_events();
+        }
 
         // Check if STAT interupt should be set on first tick
         if (this->mode_timer_itx == 0 &&
@@ -234,6 +261,8 @@ void VPU::tick()
             }
         }
     }
+    
+    return return_val;
 }
 
 uint8_t VPU::get_background_scroll_y() {

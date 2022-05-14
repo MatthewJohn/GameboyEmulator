@@ -159,6 +159,10 @@ void CPU::reset_state()
         this->ram->set(0xff00 + mem_itx, initial_ff00_memory_values[mem_itx]);
 }
 
+void CPU::stop() {
+    this->running = false;
+}
+
 bool CPU::is_running() {
     return this->running;
 }

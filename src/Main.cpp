@@ -116,13 +116,20 @@ int main(int argc, char *args[])
         cpu_inst->tick();
 
 #if ! DISABLE_VPU
-        vpu_inst->tick();
+        switch (vpu_inst->tick())
+        {
+            case VpuEventType::EXIT:
+                cpu_inst->stop();
+                break;
+            default:
+                break;
+        }
 #endif
 
         // Check for screenshot
         if (arguments.screenshot_ticks && arguments.screenshot_ticks == cpu_inst->get_tick_counter())
         {
-            vpu_inst->capture_screenshot(arguments.screenshot_path);
+            vpu_inst->capture_screenshot(&(arguments.screenshot_path[0]));
         }
 
     }

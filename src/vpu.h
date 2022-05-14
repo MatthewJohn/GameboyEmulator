@@ -17,14 +17,17 @@ struct vec_2d {
     unsigned int y;
 };
 
-
+enum VpuEventType {
+    NONE,
+    EXIT
+};
 
 class VPU {
 public:
     VPU(RAM *ram);
-    void tick();
+    VpuEventType tick();
     void tear_down();
-    void process_events();
+    VpuEventType process_events();
     void capture_screenshot(char* file_path);
 
     SDL_Window *window;
