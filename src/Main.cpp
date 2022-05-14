@@ -131,6 +131,7 @@ int main(int argc, char *args[])
         {
             std::cout << "Capturing Screenshot" << std::endl;
             vpu_inst->capture_screenshot(arguments.screenshot_path);
+            cpu_inst->stop();
         }
 
     }
