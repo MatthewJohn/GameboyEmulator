@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker { image 'registry.gitlab.dockstudios.co.uk/pub/docker-images/cpp-static-code-analysis:latest' }
+        docker { image 'fare-docker-reg.dock.studios:5000/docker-images/cpp-static-code-analysis:latest' }
     }
     stages {
         stage('build') {
