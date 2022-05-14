@@ -152,9 +152,9 @@ RamSubset RAM::get_high_ram() {
     return RamSubset(this->memory + 0xff80, 0x80);
 }
 
-void RAM::load_bios(char *bios_path) {
+void RAM::load_bios(arguments_t *arguments) {
     // Open file
-    std::ifstream infile(bios_path, std::ios::binary);
+    std::ifstream infile(arguments->bios_path, std::ios::binary);
 
     // Iterate through bytes in file and store in memory
     size_t addr = 0;
@@ -177,9 +177,9 @@ void RAM::load_bios(char *bios_path) {
     //std::cin.get();
 }
 
-void RAM::load_rom(char *rom_path) {
+void RAM::load_rom(arguments_t *arguments) {
     // Open file
-    std::ifstream infile(rom_path, std::ios::binary);
+    std::ifstream infile(arguments->rom_path, std::ios::binary);
 
     // Iterate through bytes in file and store in memory
     size_t addr = 0;

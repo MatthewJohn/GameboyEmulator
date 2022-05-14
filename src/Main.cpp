@@ -21,17 +21,11 @@
 
 #define PATH_SIZE 4096
 
-struct arguments_t
-{
-    char bios_path[PATH_SIZE];
-    char rom_path[PATH_SIZE];
-    char screenshot_path[PATH_SIZE];
-    int screenshot_ticks;
-};
 
-arguments_t get_arguments(int argc, char** argv)
+int main(int argc, char *args[])
 {
-    arguments_t arguments;
+    arguments_t arguments = {nullptr, nullptr, nullptr, 0};
+
 
     for(;;)
     {
@@ -41,16 +35,19 @@ arguments_t get_arguments(int argc, char** argv)
         // -b - bios file path
         // -s - screenshot filepath
         // -t - screenshot after X CPU ticks
-        switch(getopt(argc, argv, "hfbst"))
+        switch(getopt(argc, args, "hf:b:s:t:"))
         {
             case 'f':
-                snprintf( arguments.rom_path, PATH_SIZE, "%s", optarg );
+                arguments.rom_path = (char*)malloc(sizeof(optarg));
+                strcpy(arguments.rom_path, optarg);
                 continue;
             case 'b':
-                snprintf( arguments.bios_path, PATH_SIZE, "%s", optarg );
-              continue;
+                arguments.bios_path = (char*)malloc(sizeof(optarg));
+                strcpy(arguments.bios_path, optarg);
+                continue;
             case 's':
-                snprintf( arguments.screenshot_path, PATH_SIZE, "%s", optarg );
+                arguments.screenshot_path = (char*)malloc(sizeof(optarg));
+                strcpy(arguments.screenshot_path, optarg);
                 continue;
             case 't':
                 arguments.screenshot_ticks = atoi(optarg);
@@ -60,6 +57,7 @@ arguments_t get_arguments(int argc, char** argv)
             case 'h':
             default :
                 std::cout << "Usage: ./GameboyEmulator -b <BIOS path> -f <ROM path> [-s <Screenshot filepath> -t <Screenshot After X CPU ticks>]" << std::endl;
+                exit(1);
                 break;
 
             case -1:
@@ -69,13 +67,6 @@ arguments_t get_arguments(int argc, char** argv)
         break;
     }
 
-    return arguments;
-}
-
-
-int main(int argc, char** args)
-{
-    arguments_t arguments = get_arguments(argc, args);
     
     Helper::init();
     RAM *ram_inst = new RAM();
@@ -90,7 +81,18 @@ int main(int argc, char** args)
     cpu_inst->reset_state();
 
     // Load bios/RAM
-    //char arguments.bios_path = "./copyright/DMG_ROM.bin";
+    if (! arguments.bios_path)
+    {
+        char bios_path[] = "./copyright/DMG_ROM.bin";
+        arguments.bios_path = (char*)malloc(sizeof(bios_path));
+        strcpy(arguments.bios_path, bios_path);
+    }
+    if (! arguments.rom_path)
+    {
+        char rom_path[] = "./resources/test_roms/cpu_instrs/individual/08-misc instrs.gb";
+        arguments.rom_path = (char*)malloc(sizeof(rom_path));
+        strcpy(arguments.rom_path, rom_path);
+    }
 
     //char bios_path[] = "./matt-test-daa.rom";
     //char rom_path[] = "./copyright/Tetris (JUE) (V1.1) [!].gb";
@@ -112,12 +114,8 @@ int main(int argc, char** args)
     //arguments.rom_path = "./resources/test_roms/cpu_instrs/individual/08-misc instrs.gb";
     //char rom_path[] = "./debug/testrom.gb";
     //char rom_path[] = "./copyright/dmg_test_prog_ver1.gb";
-    ram_inst->load_bios(arguments.bios_path);
-    ram_inst->load_rom(arguments.rom_path);
-
-#if ! DISABLE_VPU
-    bool to_vpu_tick = true;
-#endif
+    ram_inst->load_bios(&arguments);
+    ram_inst->load_rom(&arguments);
 
     // run the program as long as the window is open
     while (cpu_inst->is_running())
@@ -125,11 +123,7 @@ int main(int argc, char** args)
         cpu_inst->tick();
 
 #if ! DISABLE_VPU
-        if (to_vpu_tick)
-        {
-            vpu_inst->tick();
-        }
-        to_vpu_tick = ! to_vpu_tick;
+        vpu_inst->tick();
 #endif
 
         // Check for screenshot

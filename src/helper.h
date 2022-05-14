@@ -3,6 +3,9 @@
 // Proprietary and confidential
 // Written by Matt Comben <matthew@dockstudios.co.uk>, May 2019
 
+#ifndef HELPER_DEF
+#define HELPER_DEF
+
 #include <iostream>
 #include <ios>
 
@@ -13,3 +16,13 @@ public:
 private:
     static std::ios_base::fmtflags RESET_FLAGS;
 };
+
+struct arguments_t
+{
+    char *bios_path;
+    char *rom_path;
+    char *screenshot_path;
+    int screenshot_ticks;
+};
+
+#endif

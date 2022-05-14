@@ -6,6 +6,7 @@
 #pragma once
 
 #include <memory>
+#include "helper.h"
 #include "ram_subset.h"
 
 class TestRunner;
@@ -37,8 +38,8 @@ public:
     RamSubset get_oam();
     RamSubset get_io_registers();
     RamSubset get_high_ram();
-    void load_bios(char *bios_path);
-    void load_rom(char *rom_path);
+    void load_bios(arguments_t *arguments);
+    void load_rom(arguments_t *arguments);
     bool boot_rom_swapped;
 
     uint8_t get_ram_bit(uint16_t address, unsigned int bit_shift);
