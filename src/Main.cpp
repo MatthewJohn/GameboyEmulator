@@ -129,7 +129,8 @@ int main(int argc, char *args[])
         // Check for screenshot
         if (arguments.screenshot_ticks && arguments.screenshot_ticks == cpu_inst->get_tick_counter())
         {
-            vpu_inst->capture_screenshot(&(arguments.screenshot_path[0]));
+            std::cout << "Capturing Screenshot" << std::endl;
+            vpu_inst->capture_screenshot(arguments.screenshot_path);
         }
 
     }
