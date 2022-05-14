@@ -199,7 +199,6 @@ void RAM::load_rom(arguments_t *arguments) {
     }
     if (DEBUG)
         infile.close();
-    std::cin.get();
 }
 void RAM::swap_boot_rom() {
     uint8_t temp;

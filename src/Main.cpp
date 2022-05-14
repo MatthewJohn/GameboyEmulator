@@ -127,7 +127,6 @@ int main(int argc, char *args[])
 
     }
 
-    std::cin.get();
     vpu_inst->tear_down();
 
     return 0;
