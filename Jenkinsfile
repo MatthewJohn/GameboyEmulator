@@ -7,7 +7,7 @@ pipeline {
             steps {
                 sh 'cmake .'
                 sh 'make all'
-                stash includes: './GameboyEmulator', name: 'app'
+                stash includes: 'GameboyEmulator', name: 'app'
             }
         }
         stage('Test 01-special') {
