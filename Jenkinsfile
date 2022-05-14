@@ -1,9 +1,13 @@
 pipeline {
     agent {
-        docker { image 'fare-docker-reg.dock.studios:5000/docker-images/cpp-static-code-analysis:latest' }
+        any
     }
     stages {
         stage('build') {
+            agent {
+                docker { image 'fare-docker-reg.dock.studios:5000/docker-images/cpp-static-code-analysis:latest' }
+            }
+
             steps {
                 sh 'rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake'
                 sh 'cmake .'
