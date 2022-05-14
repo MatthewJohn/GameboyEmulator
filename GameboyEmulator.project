@@ -1,61 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CodeLite_Project Name="GameboyEmulator" InternalType="">
-	<VirtualDirectory Name="src">
-		<VirtualDirectory Name="src">
-			<File Name="src/Main.cpp"/>
-			<File Name="src/cpu.cpp"/>
-			<File Name="src/helper.cpp"/>
-			<File Name="src/ram.cpp"/>
-			<File Name="src/ram_subset.cpp"/>
-			<File Name="src/test_runner.cpp"/>
-			<File Name="src/vpu.cpp"/>
-		</VirtualDirectory>
-	</VirtualDirectory>
-	<VirtualDirectory Name="include">
-		<VirtualDirectory Name="src">
-			<File Name="src/cpu.h"/>
-			<File Name="src/helper.h"/>
-			<File Name="src/ram.h"/>
-			<File Name="src/ram_subset.h"/>
-			<File Name="src/test_runner.h"/>
-			<File Name="src/vpu.h"/>
-		</VirtualDirectory>
-	</VirtualDirectory>
-	<Settings Type="Executable">
-		<Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-			<Compiler Options="-g" Required="yes" PreCompiledHeader="">
-				<IncludePath Value="."/>
-			</Compiler>
-			<Linker Options="" Required="yes"/>
-			<ResourceCompiler Options="" Required="no"/>
-			<General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./" Command="./$(ProjectName)" CommandArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes"/>
-			<Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
-				<PostConnectCommands/>
-				<StartupCommands/>
-			</Debugger>
-			<PreBuild/>
-			<PostBuild/>
-			<CustomBuild Enabled="yes">
-				<RebuildCommand>/usr/bin/make -f$(ProjectPath)/Makefile -j 32 clean &amp;&amp; /usr/bin/make -f$(ProjectPath)/Makefile -j 32</RebuildCommand>
-				<CleanCommand>/usr/bin/make -f$(ProjectPath)/Makefile -j 32 clean</CleanCommand>
-				<BuildCommand>/usr/bin/make -f$(ProjectPath)/Makefile -j 32</BuildCommand>
-				<SingleFileCommand>/usr/bin/make -f$(ProjectPath)/Makefile -B $(CurrentFileFullName).o</SingleFileCommand>
-				<PreprocessFileCommand/>
-				<WorkingDirectory>$(WorkspacePath)</WorkingDirectory>
-			</CustomBuild>
-			<AdditionalRules>
-				<CustomPostBuild/>
-				<CustomPreBuild/>
-			</AdditionalRules>
-		</Configuration>
-		<GlobalSettings>
-			<Compiler Options="">
-				<IncludePath Value="."/>
-			</Compiler>
-			<Linker Options="">
-				<LibraryPath Value="."/>
-			</Linker>
-			<ResourceCompiler Options=""/>
-		</GlobalSettings>
-	</Settings>
+<CodeLite_Project Name="GameboyEmulator" InternalType="" Version="10.0.0">
+  <VirtualDirectory Name="src">
+    <VirtualDirectory Name="src">
+      <File Name="src/Main.cpp"/>
+      <File Name="src/cpu.cpp"/>
+      <File Name="src/helper.cpp"/>
+      <File Name="src/ram.cpp"/>
+      <File Name="src/ram_subset.cpp"/>
+      <File Name="src/test_runner.cpp"/>
+      <File Name="src/vpu.cpp"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
+  <VirtualDirectory Name="include">
+    <VirtualDirectory Name="src">
+      <File Name="src/cpu.h"/>
+      <File Name="src/helper.h"/>
+      <File Name="src/ram.h"/>
+      <File Name="src/ram_subset.h"/>
+      <File Name="src/test_runner.h"/>
+      <File Name="src/vpu.h"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
+  <Settings Type="Executable">
+    <GlobalSettings>
+      <Compiler Options="" C_Options="" Assembler="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g" C_Options="-g" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="yes">
+        <RebuildCommand>/usr/bin/make -f$(ProjectPath)/Makefile -j 32 clean &amp;&amp; /usr/bin/make -f$(ProjectPath)/Makefile -j 32</RebuildCommand>
+        <CleanCommand>/usr/bin/make -f$(ProjectPath)/Makefile -j 32 clean</CleanCommand>
+        <BuildCommand>/usr/bin/make -f$(ProjectPath)/Makefile -j 32</BuildCommand>
+        <PreprocessFileCommand/>
+        <SingleFileCommand>/usr/bin/make -f$(ProjectPath)/Makefile -B $(CurrentFileFullName).o</SingleFileCommand>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory>$(WorkspacePath)</WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Screenshot" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g" C_Options="-g" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./" Command="./$(ProjectName)" CommandArguments="-f ./resources/test_roms/gb-test-roms/cpu_instrs/individual/01-special.gb -b ./copyright/DMG_ROM.bin -s ./output.bmp -t 100000" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="yes">
+        <RebuildCommand>/usr/bin/make -f$(ProjectPath)/Makefile -j 32 clean &amp;&amp; /usr/bin/make -f$(ProjectPath)/Makefile -j 32</RebuildCommand>
+        <CleanCommand>/usr/bin/make -f$(ProjectPath)/Makefile -j 32 clean</CleanCommand>
+        <BuildCommand>/usr/bin/make -f$(ProjectPath)/Makefile -j 32</BuildCommand>
+        <PreprocessFileCommand/>
+        <SingleFileCommand>/usr/bin/make -f$(ProjectPath)/Makefile -B $(CurrentFileFullName).o</SingleFileCommand>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory>$(WorkspacePath)</WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+  </Settings>
 </CodeLite_Project>
