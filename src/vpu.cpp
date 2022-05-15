@@ -234,12 +234,6 @@ VpuEventType VPU::tick()
     }
     else if (this->current_mode == this->MODE::MODE0)
     {
-        // Handle events at beginning of h-blank
-        if (this->mode_timer_itx == 0) {
-            // Handle events
-            return_val = this->process_events();
-        }
-
         // Check if STAT interupt should be set on first tick
         if (this->mode_timer_itx == 0 &&
             this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 3) == 1)
@@ -253,6 +247,9 @@ VpuEventType VPU::tick()
         // If timer is at 0, check for interrupts
         if (this->mode_timer_itx == 0)
         {
+            // Handle events and redraw at beginning of h-blank
+            return_val = this->process_events();
+
             // Trigger v-blank interupt
             this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0, 1U);
 
