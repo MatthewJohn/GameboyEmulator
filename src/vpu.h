@@ -104,5 +104,6 @@ private:
     uint8_t current_draw_pixel;
     void process_pixel();
     void wait_for_window();
+    void redraw();
 
 };

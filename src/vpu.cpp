@@ -65,9 +65,13 @@ void VPU::capture_screenshot(char* file_path)
     SDL_FreeSurface(sshot);
 }
 
-VpuEventType VPU::process_events() {
+void VPU::redraw()
+{
+    // Redraw SDL
     SDL_RenderPresent(this->renderer);
-    
+}
+
+VpuEventType VPU::process_events() {   
     // Handle SDL events
     SDL_Event event;
     while(SDL_PollEvent(&event) != 0) {
@@ -194,6 +198,9 @@ VpuEventType VPU::tick()
 
     this->update_mode_flag();
 
+    // Handle SDL2 events
+    return_val = this->process_events();
+
 
     // Check current mode
     if (this->current_mode == this->MODE::MODE2)
@@ -247,8 +254,8 @@ VpuEventType VPU::tick()
         // If timer is at 0, check for interrupts
         if (this->mode_timer_itx == 0)
         {
-            // Handle events and redraw at beginning of h-blank
-            return_val = this->process_events();
+            // Redraw at beginning of h-blank
+            this->redraw();
 
             // Trigger v-blank interupt
             this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0, 1U);
