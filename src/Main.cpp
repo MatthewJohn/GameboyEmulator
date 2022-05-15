@@ -83,7 +83,7 @@ int main(int argc, char *args[])
     }
     if (strlen(arguments.rom_path) == 0)
     {
-        char rom_path[] = "./resources/test_roms/cpu_instrs/individual/08-misc instrs.gb";
+        char rom_path[] = "./resources/test_roms/cpu_instrs/individual/02-interrupts.gb";
         strncpy(arguments.rom_path, rom_path, sizeof(arguments.rom_path) - 1);
     }
 

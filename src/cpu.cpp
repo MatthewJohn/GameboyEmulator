@@ -374,37 +374,31 @@ void CPU::check_interupts() {
         }
     }
 
-        
-        
-        
-    // If interupt state is either enabled or pending disable,
-    // check interupts
-    if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
+
+    // Check if LCD Status has been triggered and interupt is enabled
+    if (this->ram->get_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 1) &&
+        this->ram->get_ram_bit(this->ram->INTERUPT_IE_REGISTER_ADDRESS, 1))
     {
-        // LCD status interupt
-        if ((this->ram->get_val(this->ram->LCDC_STATUS_ADDR) & (uint8_t)0x08))
-        {
-            if (! this->h_blank_executed)
-            {
-                if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
-                    std::cout << std::hex << "Got h-blank interupt at: " << (unsigned int)this->r_pc.get_value() << std::endl;
+        // Reset interupt user interupt bit
+        this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 1, 0);
 
-                // Do a straight jump to 0x0048
-                this->r_pc.set_value(this->LCDC_STATUS_INTERUPT_PTR_ADDR);
+        // If interupt state is either enabled or pending disable,
+        // jump to interupt address
+        if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
+        {
+            if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
+                std::cout << "Got STAT INTERUPT!" << std::endl;
+
+            // Push current pointer to stack and update PC to
+            // interupt address
+            this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
+            this->r_pc.set_value(this->ram->get_val(this->LCDC_STATUS_INTERUPT_PTR_ADDR));
             
-                // Mark interupt for h_blank as being executed
-                this->h_blank_executed = true;
-
-                // Return to ensure no other interupts are processed.
-                return;
-            }
-        }
-        else
-        {
-            // Reset, since we're out of the h_blank period
-            this->h_blank_executed = false;
+            // Do not process any more interupts
+            return;
         }
     }
+
 
     // Check if timer has been triggered and interupt is enabled
     if (this->ram->get_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 2) &&

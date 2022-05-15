@@ -252,7 +252,7 @@ VpuEventType VPU::tick()
         {
             // Redraw at beginning of h-blank
             this->redraw();
-
+ 
             // Handle SDL2 events
             return_val = this->process_events();
 
