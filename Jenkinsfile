@@ -34,7 +34,7 @@ pipeline {
                         }
                         post {
                             always {
-                                archiveArtifacts artifacts: 'output.bmp,comparison.jpg', fingerprint: false
+                                archiveArtifacts artifacts: '*.bmp,*.jpg', fingerprint: false
                             }
                         }
                     }
