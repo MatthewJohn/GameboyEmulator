@@ -2,11 +2,11 @@
 <CodeLite_Workspace Name="GameboyEmulator" Version="10.0.0">
   <Project Name="GameboyEmulator" Path="GameboyEmulator.project" Active="Yes"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="GameboyEmulator" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Screenshot" Selected="yes">
+    <WorkspaceConfiguration Name="Screenshot" Selected="no">
       <Environment/>
       <Project Name="GameboyEmulator" ConfigName="Screenshot"/>
     </WorkspaceConfiguration>
