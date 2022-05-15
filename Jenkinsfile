@@ -34,7 +34,7 @@ pipeline {
                         }
                         post {
                             always {
-                                archiveArtifacts artifacts: '*.bmp,*.jpg', fingerprint: false
+                                archiveArtifacts artifacts: '*.bmp,*.jpg', fingerprint: false, allowEmptyArchive: true
                             }
                         }
                     }
