@@ -20,7 +20,7 @@ pipeline {
                     values '01-special', '02-interrupts', '03-op_sp,hl', '04-op_r,imm', '05-op_rp', '06-ld_r,r', '07-jr,jp,call,ret,rst', '08-misc-instrs', '09-op_r,r', '10-bit_ops', '11-op_a,-hl'
                 }
                 stages {
-                    stage("Test - ${TEST_NAME}") {
+                    stage('Perform test') {
                         agent {
                             docker { image 'fare-docker-reg.dock.studios:5000/docker-images/screenshot-tool:latest' }
                         }
