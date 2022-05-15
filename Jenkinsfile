@@ -13,17 +13,23 @@ pipeline {
                 stash includes: 'GameboyEmulator', name: 'app'
             }
         }
-        stage('Test 01-special') {
-            agent {
-                docker { image 'fare-docker-reg.dock.studios:5000/docker-images/screenshot-tool:latest' }
-            }
-            steps {
-              unstash 'app'
-              sh 'bash ./tests/system/01-special.sh'
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'output.bmp,comparison.jpg', fingerprint: false
+        stage('System tests') {
+            matrix {
+                agent {
+                    docker { image 'fare-docker-reg.dock.studios:5000/docker-images/screenshot-tool:latest' }
+                }
+                axis {
+                    name 'TEST_NAME'
+                    values '01-special', '02-interrupts', '03-op_sp,hl', '04-op_r,imm', '05-op_rp', '06-ld_r,r', '07-jr,jp,call,ret,rst', '08-misc-instrs', '09-op_r,r', '10-bit_ops', '11-op_a,-hl'
+                }
+                steps {
+                  unstash 'app'
+                  sh "bash ./tests/system/${TEST_NAME}.sh"
+                }
+                post {
+                    always {
+                        archiveArtifacts artifacts: 'output.bmp,comparison.jpg', fingerprint: false
+                    }
                 }
             }
         }
