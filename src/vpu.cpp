@@ -198,10 +198,6 @@ VpuEventType VPU::tick()
 
     this->update_mode_flag();
 
-    // Handle SDL2 events
-    return_val = this->process_events();
-
-
     // Check current mode
     if (this->current_mode == this->MODE::MODE2)
     {
@@ -256,6 +252,9 @@ VpuEventType VPU::tick()
         {
             // Redraw at beginning of h-blank
             this->redraw();
+
+            // Handle SDL2 events
+            return_val = this->process_events();
 
             // Trigger v-blank interupt
             this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0, 1U);
