@@ -184,7 +184,7 @@ void VPU::increment_lx_ly()
 
 void VPU::trigger_stat_interrupt()
 {
-    this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 1, 1U);
+    this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 1, 1U);
 }
 
 
@@ -212,7 +212,7 @@ VpuEventType VPU::tick()
                 this->trigger_stat_interrupt();
             }
 
-            // Check if STAT interupt should be set on first tick
+            // Check if STAT interrupt should be set on first tick
             if (this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 5) == 1)
             {
                 this->trigger_stat_interrupt();
@@ -237,7 +237,7 @@ VpuEventType VPU::tick()
     }
     else if (this->current_mode == this->MODE::MODE0)
     {
-        // Check if STAT interupt should be set on first tick
+        // Check if STAT interrupt should be set on first tick
         if (this->mode_timer_itx == 0 &&
             this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 3) == 1)
         {
@@ -256,10 +256,10 @@ VpuEventType VPU::tick()
             // Handle SDL2 events
             return_val = this->process_events();
 
-            // Trigger v-blank interupt
-            this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0, 1U);
+            // Trigger v-blank interrupt
+            this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 0, 1U);
 
-            // Check if STAT interupt should be set on first tick
+            // Check if STAT interrupt should be set on first tick
             if (this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 4) == 1)
             {
                 this->trigger_stat_interrupt();

@@ -69,13 +69,13 @@ public:
     int get_tick_counter();
     //void print_state();
 protected:
-    enum INTERUPT_STATE {
+    enum INTERRUPT_STATE {
         DISABLED,
         PENDING_DISABLE,
         PENDING_ENABLE,
         ENABLED
     };
-    INTERUPT_STATE interupt_state;
+    INTERRUPT_STATE interrupt_state;
     bool halt_state;
     bool cb_state;
     bool stepped_in;
@@ -108,16 +108,16 @@ protected:
     const int CPU_FREQ = 4000000;
 
     // Interupts  
-    const uint16_t VBLANK_INTERUPT_PTR_ADDR = 0x0040;
+    const uint16_t VBLANK_INTERRUPT_PTR_ADDR = 0x0040;
     
-    const uint16_t LCDC_STATUS_INTERUPT_PTR_ADDR = 0x0048;
+    const uint16_t LCDC_STATUS_INTERRUPT_PTR_ADDR = 0x0048;
 
     // Timer config
     const int TIMER_FREQ[4] = {4096, 262144, 65536, 16384};
     const uint16_t TIMA_TIMER_COUNTER_ADDRESS = 0xff05;
-    const uint16_t TMA_TIMER_INTERUPT_MODULO_ADDRESS = 0xff06;
+    const uint16_t TMA_TIMER_INTERRUPT_MODULO_ADDRESS = 0xff06;
     const uint16_t TAC_TIMER_CONTROL_MEM_ADDRESS = 0xff07;
-    const uint16_t TIMER_INTERUPT_PTR_ADDR = 0x0050;
+    const uint16_t TIMER_INTERRUPT_PTR_ADDR = 0x0050;
 
     // Registers
     //  Accumulator
@@ -156,7 +156,7 @@ protected:
     // Current ticks to execute operation
     uint8_t current_op_ticks;
 
-    void check_interupts();
+    void check_interrupts();
     int checked_op_codes[1000];
     int checked_op_codes_itx;
     int checked_cb_codes[1000];

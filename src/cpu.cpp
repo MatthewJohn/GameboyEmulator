@@ -22,7 +22,7 @@
 // TODO DEBUG -> CPU count: 2ccdee a == 0080 (should be 00c0) before add hl hl ?
 
 #define DEBUG 0
-#define INTERUPT_DEBUG 1
+#define INTERRUPT_DEBUG 1
 //#define STEPIN 0x0101
 //#define STEPIN 0x07f2
 //#define STEPIN 0x00//x0217//x075b
@@ -137,7 +137,7 @@ void CPU::reset_state()
     this->cb_state = false;
     this->timer_itx = 0;
 
-    this->interupt_state = this->INTERUPT_STATE::DISABLED;
+    this->interrupt_state = this->INTERRUPT_STATE::DISABLED;
     this->halt_state = false;
 
     this->r_sp.set_value(0xfffe);
@@ -197,17 +197,17 @@ void CPU::tick() {
 //    if (this->get_timer_state())
     this->increment_timer();
     
-    // Check for interupts if internal state is true
-    if (this->interupt_state == this->INTERUPT_STATE::ENABLED ||
-            this->interupt_state == this->INTERUPT_STATE::PENDING_DISABLE)
-        this->check_interupts();
+    // Check for interrupts if internal state is true
+    if (this->interrupt_state == this->INTERRUPT_STATE::ENABLED ||
+            this->interrupt_state == this->INTERRUPT_STATE::PENDING_DISABLE)
+        this->check_interrupts();
 
-    // Check if interupt state is in a pending state
+    // Check if interrupt state is in a pending state
     // and move to actual state, since a clock cycle has been waited
-    if (this->interupt_state == this->INTERUPT_STATE::PENDING_DISABLE)
-        this->interupt_state = this->INTERUPT_STATE::DISABLED;
-    if (this->interupt_state == this->INTERUPT_STATE::PENDING_ENABLE)
-        this->interupt_state = this->INTERUPT_STATE::ENABLED;
+    if (this->interrupt_state == this->INTERRUPT_STATE::PENDING_DISABLE)
+        this->interrupt_state = this->INTERRUPT_STATE::DISABLED;
+    if (this->interrupt_state == this->INTERRUPT_STATE::PENDING_ENABLE)
+        this->interrupt_state = this->INTERRUPT_STATE::ENABLED;
 
     if (this->halt_state)
         return;
@@ -317,13 +317,13 @@ void CPU::increment_timer()
         // Check if timer overflowed
         if (this->get_timer_state() && this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
         {
-            // Set timer interupt
-            this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 3, 1);
+            // Set timer interrupt
+            this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 3, 1);
             // Reset counter value back to moduli
             this->ram->set(
                 this->TIMA_TIMER_COUNTER_ADDRESS,
                 // Perform XOR with 0xff to convert timer modulus to start value
-                0xff ^ this->ram->get_val(this->TMA_TIMER_INTERUPT_MODULO_ADDRESS)
+                0xff ^ this->ram->get_val(this->TMA_TIMER_INTERRUPT_MODULO_ADDRESS)
             );
         }
     }
@@ -348,76 +348,76 @@ void CPU::print_state_m() {
         "pc: " << std::setfill('0') << std::setw(4) << this->r_pc.get_value() << std::endl;
 }
 
-void CPU::check_interupts() {
+void CPU::check_interrupts() {
 
-    // Check if VLBANK has been triggered and interupt is enabled
-    if (this->ram->get_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0) &&
-        this->ram->get_ram_bit(this->ram->INTERUPT_IE_REGISTER_ADDRESS, 0))
+    // Check if VLBANK has been triggered and interrupt is enabled
+    if (this->ram->get_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 0) &&
+        this->ram->get_ram_bit(this->ram->INTERRUPT_IE_REGISTER_ADDRESS, 0))
     {
-        // Reset interupt user interupt bit
-        this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 0, 0);
+        // Reset interrupt user interrupt bit
+        this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 0, 0);
 
-        // If interupt state is either enabled or pending disable,
-        // jump to interupt address
-        if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
+        // If interrupt state is either enabled or pending disable,
+        // jump to interrupt address
+        if (this->interrupt_state == this->INTERRUPT_STATE::ENABLED)
         {
-            if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << "Got VLBANK INTERUPT!" << std::endl;
+            if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
+                std::cout << "Got VLBANK INTERRUPT!" << std::endl;
 
             // Push current pointer to stack and update PC to
-            // interupt address
+            // interrupt address
             this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-            this->r_pc.set_value(this->ram->get_val(this->VBLANK_INTERUPT_PTR_ADDR));
+            this->r_pc.set_value(this->ram->get_val(this->VBLANK_INTERRUPT_PTR_ADDR));
             
-            // Do not process any more interupts
+            // Do not process any more interrupts
             return;
         }
     }
 
 
-    // Check if LCD Status has been triggered and interupt is enabled
-    if (this->ram->get_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 1) &&
-        this->ram->get_ram_bit(this->ram->INTERUPT_IE_REGISTER_ADDRESS, 1))
+    // Check if LCD Status has been triggered and interrupt is enabled
+    if (this->ram->get_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 1) &&
+        this->ram->get_ram_bit(this->ram->INTERRUPT_IE_REGISTER_ADDRESS, 1))
     {
-        // Reset interupt user interupt bit
-        this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 1, 0);
+        // Reset interrupt user interrupt bit
+        this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 1, 0);
 
-        // If interupt state is either enabled or pending disable,
-        // jump to interupt address
-        if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
+        // If interrupt state is either enabled or pending disable,
+        // jump to interrupt address
+        if (this->interrupt_state == this->INTERRUPT_STATE::ENABLED)
         {
-            if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << "Got STAT INTERUPT!" << std::endl;
+            if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
+                std::cout << "Got STAT INTERRUPT!" << std::endl;
 
             // Push current pointer to stack and update PC to
-            // interupt address
+            // interrupt address
             this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-            this->r_pc.set_value(this->ram->get_val(this->LCDC_STATUS_INTERUPT_PTR_ADDR));
+            this->r_pc.set_value(this->ram->get_val(this->LCDC_STATUS_INTERRUPT_PTR_ADDR));
             
-            // Do not process any more interupts
+            // Do not process any more interrupts
             return;
         }
     }
 
 
-    // Check if timer has been triggered and interupt is enabled
-    if (this->ram->get_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 2) &&
-        this->ram->get_ram_bit(this->ram->INTERUPT_IE_REGISTER_ADDRESS, 2))
+    // Check if timer has been triggered and interrupt is enabled
+    if (this->ram->get_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 2) &&
+        this->ram->get_ram_bit(this->ram->INTERRUPT_IE_REGISTER_ADDRESS, 2))
     {
-        // Reset interupt user interupt bit
-        this->ram->set_ram_bit(this->ram->INTERUPT_IF_REGISTER_ADDRESS, 3, 0);
+        // Reset interrupt user interrupt bit
+        this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 3, 0);
 
-        // If interupt state is either enabled or pending disable,
-        // jump to interupt address
-        if (this->interupt_state == this->INTERUPT_STATE::ENABLED)
+        // If interrupt state is either enabled or pending disable,
+        // jump to interrupt address
+        if (this->interrupt_state == this->INTERRUPT_STATE::ENABLED)
         {
-            if (INTERUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << "Got TIMER INTERUPT!" << std::endl;
+            if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
+                std::cout << "Got TIMER INTERRUPT!" << std::endl;
 
             // Push current pointer to stack and update PC to
-            // interupt address
+            // interrupt address
             this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-            this->r_pc.set_value(this->ram->get_val(this->TIMER_INTERUPT_PTR_ADDR));
+            this->r_pc.set_value(this->ram->get_val(this->TIMER_INTERRUPT_PTR_ADDR));
         }
 
         return;
@@ -1402,7 +1402,7 @@ uint8_t CPU::execute_op_code(unsigned int op_val) {
             break;
         case 0xd9:
             this->op_Return();
-            // Re-enable interupts
+            // Re-enable interrupts
             this->op_EI();
             t = 16;
             break;
@@ -1496,7 +1496,7 @@ uint8_t CPU::execute_op_code(unsigned int op_val) {
             t = 8;
             break;
         case 0xf3:
-            // Disable interupts
+            // Disable interrupts
             this->op_DI();
             t = 4;
             break;
@@ -1531,7 +1531,7 @@ uint8_t CPU::execute_op_code(unsigned int op_val) {
             t = 16;
             break;
         case 0xfb:
-            // Enable interupts
+            // Enable interrupts
             this->op_EI();
             t = 4;
             break;
@@ -3334,10 +3334,10 @@ void CPU::op_Halt() {
 void CPU::op_EI() {
     // Set DI state to pending, e.g.
     // perform one more command before halting
-    this->interupt_state = this->INTERUPT_STATE::PENDING_ENABLE;
+    this->interrupt_state = this->INTERRUPT_STATE::PENDING_ENABLE;
 }
 void CPU::op_DI() {
     // Set DI state to pending, e.g.
     // perform one more command before halting
-    this->interupt_state = this->INTERUPT_STATE::PENDING_DISABLE;
+    this->interrupt_state = this->INTERRUPT_STATE::PENDING_DISABLE;
 }
