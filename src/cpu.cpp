@@ -354,24 +354,20 @@ void CPU::check_interrupts() {
     if (this->ram->get_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 0) &&
         this->ram->get_ram_bit(this->ram->INTERRUPT_IE_REGISTER_ADDRESS, 0))
     {
+
         // Reset interrupt user interrupt bit
         this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 0, 0);
 
-        // If interrupt state is either enabled or pending disable,
-        // jump to interrupt address
-        if (this->interrupt_state == this->INTERRUPT_STATE::ENABLED)
-        {
-            if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << "Got VLBANK INTERRUPT!" << std::endl;
+        if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
+            std::cout << "Got VLBANK INTERRUPT!" << std::endl;
 
-            // Push current pointer to stack and update PC to
-            // interrupt address
-            this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-            this->r_pc.set_value(this->ram->get_val(this->VBLANK_INTERRUPT_PTR_ADDR));
-            
-            // Do not process any more interrupts
-            return;
-        }
+        // Push current pointer to stack and update PC to
+        // interrupt address
+        this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
+        this->r_pc.set_value(this->ram->get_val(this->VBLANK_INTERRUPT_PTR_ADDR));
+        
+        // Do not process any more interrupts
+        return;
     }
 
 
@@ -382,21 +378,16 @@ void CPU::check_interrupts() {
         // Reset interrupt user interrupt bit
         this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 1, 0);
 
-        // If interrupt state is either enabled or pending disable,
-        // jump to interrupt address
-        if (this->interrupt_state == this->INTERRUPT_STATE::ENABLED)
-        {
-            if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << "Got STAT INTERRUPT!" << std::endl;
+        if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
+            std::cout << "Got STAT INTERRUPT!" << std::endl;
 
-            // Push current pointer to stack and update PC to
-            // interrupt address
-            this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-            this->r_pc.set_value(this->ram->get_val(this->LCDC_STATUS_INTERRUPT_PTR_ADDR));
-            
-            // Do not process any more interrupts
-            return;
-        }
+        // Push current pointer to stack and update PC to
+        // interrupt address
+        this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
+        this->r_pc.set_value(this->ram->get_val(this->LCDC_STATUS_INTERRUPT_PTR_ADDR));
+
+        // Do not process any more interrupts
+        return;
     }
 
 
@@ -407,18 +398,13 @@ void CPU::check_interrupts() {
         // Reset interrupt user interrupt bit
         this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 3, 0);
 
-        // If interrupt state is either enabled or pending disable,
-        // jump to interrupt address
-        if (this->interrupt_state == this->INTERRUPT_STATE::ENABLED)
-        {
-            if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
-                std::cout << "Got TIMER INTERRUPT!" << std::endl;
+        if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
+            std::cout << "Got TIMER INTERRUPT!" << std::endl;
 
-            // Push current pointer to stack and update PC to
-            // interrupt address
-            this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-            this->r_pc.set_value(this->ram->get_val(this->TIMER_INTERRUPT_PTR_ADDR));
-        }
+        // Push current pointer to stack and update PC to
+        // interrupt address
+        this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
+        this->r_pc.set_value(this->ram->get_val(this->TIMER_INTERRUPT_PTR_ADDR));
 
         return;
     }
