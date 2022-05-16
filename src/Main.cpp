@@ -78,18 +78,20 @@ int main(int argc, char *args[])
     // Load bios/RAM
     if (strlen(arguments.bios_path) == 0)
     {
+        //char bios_path[] = "./matt-test-daa.rom";
         char bios_path[] = "./copyright/DMG_ROM.bin";
         strncpy(arguments.bios_path, bios_path, sizeof(arguments.bios_path) - 1);
     }
     if (strlen(arguments.rom_path) == 0)
     {
+        //char rom_path[] = "./resources/test_roms/cpu_instrs/individual/03-op sp,hl.gb";
+        //char rom_path[] = "./debug/testrom.gb";
+        //char rom_path[] = "./copyright/dmg_test_prog_ver1.gb";
+        //char rom_path[] = "./copyright/Tetris (JUE) (V1.1) [!].gb";
+        //char rom_path[] = "./resources/test_roms/cpu_instrs/cpu_instrs.gb";
         char rom_path[] = "./resources/test_roms/cpu_instrs/individual/02-interrupts.gb";
         strncpy(arguments.rom_path, rom_path, sizeof(arguments.rom_path) - 1);
     }
-
-    //char bios_path[] = "./matt-test-daa.rom";
-    //char rom_path[] = "./copyright/Tetris (JUE) (V1.1) [!].gb";
-    //char rom_path[] = "./resources/test_roms/cpu_instrs/cpu_instrs.gb";
     
     // Tests
     // 01-special.gb
@@ -104,9 +106,6 @@ int main(int argc, char *args[])
     // 10-bit ops.gb - passed
     // 11-op a,(hl).gb - passed
 
-    //arguments.rom_path = "./resources/test_roms/cpu_instrs/individual/08-misc instrs.gb";
-    //char rom_path[] = "./debug/testrom.gb";
-    //char rom_path[] = "./copyright/dmg_test_prog_ver1.gb";
     ram_inst->load_bios(&arguments);
     ram_inst->load_rom(&arguments);
 
