@@ -1,0 +1,12 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: build
+  image: fare-docker-reg.dock.studios:5000/docker-images/cpp-static-code-analysis:latest
+  commands:
+  - cmake .
+  - make clean all
+
