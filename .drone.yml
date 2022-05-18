@@ -19,7 +19,7 @@ steps:
   - curl --fail -k -u "$ARTIFACT_USERNAME:$ARTIFACT_PASSWORD" --upload-file ./GameboyEmulator $ARTIFACT_BASE_URL/${DRONE_COMMIT}/GameboyEmulator
 
 - name: System tests
-  image: 
+  image: fare-docker-reg.dock.studios:5000/docker-images/screenshot-tool:latest
   commands:
   - bash ./tests/system/01-special.sh
 
