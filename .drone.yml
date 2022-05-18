@@ -22,5 +22,14 @@ steps:
   image: fare-docker-reg.dock.studios:5000/docker-images/screenshot-tool:latest
   commands:
   - bash ./tests/system/01-special.sh
-
+  - bash ./tests/system/02-interrupts.sh
+  - bash ./tests/system/03-op_sp,hl.sh
+  - bash ./tests/system/04-op_r,imm.sh
+  - bash ./tests/system/05-op_rp.sh
+  - bash ./tests/system/06-ld_r,r.sh
+  - bash ./tests/system/07-jr,jp,call,ret,rst.sh
+  - bash ./tests/system/08-misc-instrs.sh
+  - bash ./tests/system/09-op_r,r.sh
+  - bash ./tests/system/10-bit_ops.sh
+  - bash ./tests/system/11-op_a,-hl.sh
 
