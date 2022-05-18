@@ -18,5 +18,9 @@ steps:
   - make clean all
   - curl --fail -k -u "$ARTIFACT_USERNAME:$ARTIFACT_PASSWORD" --upload-file ./GameboyEmulator $ARTIFACT_BASE_URL/${DRONE_COMMIT}/GameboyEmulator
 
+- name: System tests
+  image: 
+  commands:
+  - bash ./tests/system/01-special.sh
 
 
