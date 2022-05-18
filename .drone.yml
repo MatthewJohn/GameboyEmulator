@@ -6,9 +6,16 @@ name: default
 steps:
 - name: build
   image: fare-docker-reg.dock.studios:5000/docker-images/cpp-static-code-analysis:latest
+  environment:
+    ARTIFACT_USERNAME:
+      from_secret: ARTIFACT_USERNAME
+    ARTIFACT_PASSWORD:
+      from_secret: ARTIFACT_PASSWORD
+    ARTIFACT_BASE_URL:
+      from_secret: ARTIFACT_BASE_URL
   commands:
   - cmake .
   - make clean all
-  - curl -k -u "$ARTIFACT_USERNAME{}:${ARTIFACT_PASSWORD}" --upload-file ./GameboyEmulator ${ARTIFACT_BASE_URL}/${DRONE_COMMIT}/GameboyEmulator
+  - curl -k -u "${ARTIFACT_USERNAME}:${ARTIFACT_PASSWORD}" --upload-file ./GameboyEmulator ${ARTIFACT_BASE_URL}/${DRONE_COMMIT}/GameboyEmulator
 
 
