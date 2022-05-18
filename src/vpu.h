@@ -19,7 +19,8 @@ struct vec_2d {
 
 enum VpuEventType {
     NONE,
-    EXIT
+    EXIT,
+    TERMINAL
 };
 
 class VPU {

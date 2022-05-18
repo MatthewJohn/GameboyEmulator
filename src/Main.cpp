@@ -20,6 +20,25 @@
 #define DISABLE_VPU 0
 
 
+void handle_terminal_entry(CPU* cpu_inst, VPU* vpu_inst, RAM* ram_inst)
+{
+    char cmd_in[50];
+    while (strcmp(cmd_in, "exit"))
+    {
+        std::cout << "Enter command: ";
+        std::cin.getline(cmd_in, 49);
+        std::cout << std::endl;
+
+        // Check CPU command
+        if (cmd_in[0] == "C")
+            cpu_inst->execute_terminal_command(cmd_in);
+        else
+            std::cout << "Unrecognised target: " << cmd_in[0] << std::endl;
+
+    }
+    
+}
+
 int main(int argc, char *args[])
 {
     arguments_t arguments = {0, 0, 0, 0};
@@ -119,6 +138,9 @@ int main(int argc, char *args[])
         {
             case VpuEventType::EXIT:
                 cpu_inst->stop();
+                break;
+            case VpuEventType::TERMINAL:
+                handle_terminal_entry(cpu_inst, vpu_inst, ram_inst);
                 break;
             default:
                 break;

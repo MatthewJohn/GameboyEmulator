@@ -91,6 +91,10 @@ VpuEventType VPU::process_events() {
                 switch(event.key.keysym.sym) {
                     case SDLK_ESCAPE:
                         return VpuEventType::EXIT;
+                        
+                    // Handle entering terminal mode
+                    case SDLK_t:
+                        return VpuEventType::TERMINAL;
                 }
         }
     }
