@@ -16,7 +16,7 @@ steps:
   commands:
   - cmake .
   - make clean all
-  - curl -k -u "${ARTIFACT_USERNAME}:${ARTIFACT_PASSWORD}" --upload-file ./GameboyEmulator ${ARTIFACT_BASE_URL}/${DRONE_COMMIT}/GameboyEmulator
+  - curl -k -u "$ARTIFACT_USERNAME:$ARTIFACT_PASSWORD" --upload-file ./GameboyEmulator $ARTIFACT_BASE_URL/${DRONE_COMMIT}/GameboyEmulator
 
 
 
