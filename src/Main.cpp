@@ -109,14 +109,14 @@ int main(int argc, char *args[])
         //char rom_path[] = "./copyright/dmg_test_prog_ver1.gb";
         //char rom_path[] = "./copyright/Tetris (JUE) (V1.1) [!].gb";
         //char rom_path[] = "./resources/test_roms/cpu_instrs/cpu_instrs.gb";
-        char rom_path[] = "./resources/test_roms/cpu_instrs/individual/02-interrupts.gb";
+        char rom_path[] = "./resources/test_roms/cpu_instrs/individual/03-op sp,hl.gb";
         strncpy(arguments.rom_path, rom_path, sizeof(arguments.rom_path) - 1);
     }
     
     // Tests
-    // 01-special.gb
-    // 02-interrupts.gb
-    // 03-op sp,hl.gb - hangs
+    // 01-special.gb - passed!
+    // 02-interrupts.gb - hangs
+    // 03-op sp,hl.gb - E8 E8 F8 F8
     // 04-op r,imm.gb - passed
     // 05-op rp.gb - passed
     // 06-ld r,r.gb - passed

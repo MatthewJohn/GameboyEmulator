@@ -205,7 +205,7 @@ protected:
     void op_Add(combined_reg *dest, reg16 *src);
     void op_Add(reg8 *dest, uint16_t src);
     void op_Add(combined_reg *dest, uint32_t src);
-    void op_Add(reg16 *dest, unsigned int val);
+    void op_Add(reg16 *dest, int8_t val);
     void op_Sub();
     void op_Sub(reg8 *src);
     void opm_Sub(uint16_t mem_addr);

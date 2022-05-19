@@ -2794,7 +2794,6 @@ inline void CPU::op_Add(combined_reg *dest, uint32_t src) {
     dest->lower->set_value(this->data_conv32.bit8[0]);
     dest->upper->set_value(this->data_conv32.bit8[1]);
 
-    // @TODO: Ensure that the carry still works with a signed value!
     this->set_half_carry16(original_val, (uint16_t)src);
 
     // Set subtract flag to 0, since this is add
@@ -2804,17 +2803,26 @@ inline void CPU::op_Add(combined_reg *dest, uint32_t src) {
         (0x01 & this->data_conv32.bit16[1]) >> 0);
 }
 
-void CPU::op_Add(reg16 *dest, unsigned int val) {
-    // Add to value of dest
-    uint32_t res = (unsigned int)(0x00000000 | dest->get_value()) + (signed int)val;
-    // Reset subtract/zero flags
-    this->set_zero_flag(0x00);
-    this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
+void CPU::op_Add(reg16 *dest, int8_t val) {
+    // Add signed byte to reg16
+    uint16_t original_val = dest->get_value();
+    uint16_t src_uint16 = (uint16_t)val;
+
+    dest->set_value(dest->get_value() + val);
+
     this->set_register_bit(
-        &this->r_f, this->CARRY_FLAG_BIT,
-        (0x00010000 & res) >> 16);
-    this->set_half_carry16(dest->get_value(), val);
-    dest->set_value((uint8_t)(res & 0x0000ffff));
+        &this->r_f,
+        this->HALF_CARRY_FLAG_BIT,
+        ((original_val & 0x000f) + (src_uint16 & 0x000f) > 0x000f) ? 1U : 0U
+    );
+
+    this->set_register_bit(
+        &this->r_f,
+        this->CARRY_FLAG_BIT,
+        ((original_val & 0x00ff) + (src_uint16 & 0x00ff) > 0x00ff) ? 1U : 0U);
+
+    this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
+    this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, 0U);
 }
 void CPU::op_Add(reg16 *dest) {
     // Get byte from next byte, treat as signed 8-bit value
