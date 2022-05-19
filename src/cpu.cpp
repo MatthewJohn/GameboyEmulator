@@ -159,6 +159,18 @@ void CPU::reset_state()
         this->ram->set(0xff00 + mem_itx, initial_ff00_memory_values[mem_itx]);
 }
 
+void CPU::execute_terminal_command(char* cmd) {
+    // Handle step in
+    if (strcmp(cmd, "c si") == 0)
+    {
+        this->stepped_in = true;
+    }
+    else if (strcmp(cmd, "c so") == 0)
+    {
+        this->stepped_in = false;
+    }
+}
+
 void CPU::stop() {
     this->running = false;
 }

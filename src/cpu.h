@@ -67,6 +67,8 @@ public:
     void stop();
     void reset_state();
     int get_tick_counter();
+    
+    void execute_terminal_command(char* cmd);
     //void print_state();
 protected:
     enum INTERRUPT_STATE {

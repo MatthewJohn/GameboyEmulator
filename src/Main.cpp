@@ -29,8 +29,9 @@ void handle_terminal_entry(CPU* cpu_inst, VPU* vpu_inst, RAM* ram_inst)
         std::cin.getline(cmd_in, 49);
         std::cout << std::endl;
 
+        char first_char[2] = {cmd_in[0], '\0'};
         // Check CPU command
-        if (cmd_in[0] == "C")
+        if (strcmp(first_char, "c") == 0)
             cpu_inst->execute_terminal_command(cmd_in);
         else
             std::cout << "Unrecognised target: " << cmd_in[0] << std::endl;
