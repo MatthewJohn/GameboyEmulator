@@ -408,7 +408,7 @@ void CPU::check_interrupts() {
         this->ram->get_ram_bit(this->ram->INTERRUPT_IE_REGISTER_ADDRESS, 2))
     {
         // Reset interrupt user interrupt bit
-        this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 3, 0);
+        this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 2, 0);
 
         if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
             std::cout << "Got TIMER INTERRUPT!" << std::endl;
