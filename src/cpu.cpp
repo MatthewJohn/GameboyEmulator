@@ -206,7 +206,6 @@ void CPU::tick() {
         }
     }
     
-//    if (this->get_timer_state())
     this->increment_timer();
     
     // Check for interrupts if internal state is true
@@ -376,8 +375,8 @@ void CPU::check_interrupts() {
         // Push current pointer to stack and update PC to
         // interrupt address
         this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->ram->get_val(this->VBLANK_INTERRUPT_PTR_ADDR));
-        
+        this->r_pc.set_value(this->VBLANK_INTERRUPT_PTR_ADDR);
+
         // Do not process any more interrupts
         return;
     }
@@ -396,7 +395,7 @@ void CPU::check_interrupts() {
         // Push current pointer to stack and update PC to
         // interrupt address
         this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->ram->get_val(this->LCDC_STATUS_INTERRUPT_PTR_ADDR));
+        this->r_pc.set_value(this->LCDC_STATUS_INTERRUPT_PTR_ADDR);
 
         // Do not process any more interrupts
         return;
@@ -416,7 +415,7 @@ void CPU::check_interrupts() {
         // Push current pointer to stack and update PC to
         // interrupt address
         this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->ram->get_val(this->TIMER_INTERRUPT_PTR_ADDR));
+        this->r_pc.set_value(this->TIMER_INTERRUPT_PTR_ADDR);
 
         return;
     }
