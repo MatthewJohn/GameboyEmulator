@@ -1511,13 +1511,7 @@ uint8_t CPU::execute_op_code(unsigned int op_val) {
             t = 16;
             break;
         case 0xf8:
-            this->op_Load(&this->r_hl, (uint16_t)(this->r_sp.get_value() + this->get_inc_pc_val8s()));
-            // Special OP, set registers after load
-            this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, 0U);
-            this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
-            // @TODO Verify these two
-            this->set_register_bit(&this->r_f, this->HALF_CARRY_FLAG_BIT, 0U);
-            this->set_register_bit(&this->r_f, this->CARRY_FLAG_BIT, 0U);
+            this->op_LoadSpN(&this->r_hl);
             t = 12;
             break;
         case 0xf9:
@@ -2742,6 +2736,34 @@ void CPU::op_Load(combined_reg *dest, uint16_t val) {
 }
 void CPU::op_Load(reg16 *dest, combined_reg *src) {
     dest->set_value(src->value());
+}
+
+void CPU::op_LoadSpN(combined_reg* dest)
+{
+    // Obtain value from memory at SP, add signed 8 bit value and put into combined reg
+    uint16_t original_val = this->r_sp.get_value();
+
+    int8_t val = this->get_inc_pc_val8s();
+
+    uint16_t src_uint16 = (uint16_t)val;
+
+    uint16_t result = original_val + val;
+    dest->lower->set_value(result & 0xff);
+    dest->upper->set_value((result & 0xff00) >> 8);
+
+    this->set_register_bit(
+        &this->r_f,
+        this->HALF_CARRY_FLAG_BIT,
+        ((original_val & 0x000f) + (src_uint16 & 0x000f) > 0x000f) ? 1U : 0U
+    );
+
+    this->set_register_bit(
+        &this->r_f,
+        this->CARRY_FLAG_BIT,
+        ((original_val & 0x00ff) + (src_uint16 & 0x00ff) > 0x00ff) ? 1U : 0U);
+
+    this->set_register_bit(&this->r_f, this->SUBTRACT_FLAG_BIT, 0U);
+    this->set_register_bit(&this->r_f, this->ZERO_FLAG_BIT, 0U);
 }
 
 

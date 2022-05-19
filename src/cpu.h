@@ -196,6 +196,7 @@ protected:
     void opm_Load(uint16_t dest_addr, uint8_t val);
     void op_Load(reg16 *dest, combined_reg *src);
     void opm_Load(reg8 *dest, uint16_t source_addr);
+    void op_LoadSpN(combined_reg *dest);
 
     void op_Add(reg8 *dest);
     void op_Add(reg16 *dest);
