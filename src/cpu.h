@@ -107,7 +107,7 @@ protected:
     // Z flag
     const int ZERO_FLAG_BIT = 7;
 
-    const int CPU_FREQ = 4000000;
+    const int CPU_FREQ = 4194304;
 
     // Interupts  
     const uint16_t VBLANK_INTERRUPT_PTR_ADDR = 0x0040;
