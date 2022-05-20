@@ -115,7 +115,7 @@ protected:
     const uint16_t LCDC_STATUS_INTERRUPT_PTR_ADDR = 0x0048;
 
     // Timer config
-    const int TIMER_FREQ[4] = {4096, 262144, 65536, 16384};
+    const unsigned int TIMER_FREQ[4] = {4096, 262144, 65536, 16384};
     const uint16_t TIMA_TIMER_COUNTER_ADDRESS = 0xff05;
     const uint16_t TMA_TIMER_INTERRUPT_MODULO_ADDRESS = 0xff06;
     const uint16_t TAC_TIMER_CONTROL_MEM_ADDRESS = 0xff07;
