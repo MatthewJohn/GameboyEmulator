@@ -9,6 +9,29 @@
 #include "helper.h"
 #include "ram_subset.h"
 
+// Video addresses
+#define LCDC_CONTROL_ADDR 0xff40 // LCD Control
+#define LCDC_STATUS_ADDR  0xff41 // LCD status
+#define LCDC_SCY          0xff42 // Background Scroll Y
+#define LCDC_SCX          0xff43 // Background Scroll X
+#define LCDC_LY_ADDR      0xff44 // Current line draw iterator
+#define LCDC_LYC_ADDR     0xff45 // Custom location for interrupt if LY equals this
+#define LCDC_WY_ADDR      0xff4a // Window y position
+#define LCDC_WX_ADDR      0xff4b // Window x position
+
+// Interupts
+#define INTERRUPT_IF_REGISTER_ADDRESS  0xff0f // Flags to determine that interrupt has occurred
+#define INTERRUPT_IE_REGISTER_ADDRESS  0xffff // Interupt enable flags for different types of interrupts
+#define VBLANK_INTERRUPT_PTR_ADDR      0x0040
+#define LCDC_STATUS_INTERRUPT_PTR_ADDR 0x0048
+#define TIMER_INTERRUPT_PTR_ADDR       0x0050
+
+// Timer
+#define DIV_TIMER_DIVIDER_ADDRESS          0xff04
+#define TIMA_TIMER_COUNTER_ADDRESS         0xff05
+#define TMA_TIMER_INTERRUPT_MODULO_ADDRESS 0xff06
+#define TAC_TIMER_CONTROL_MEM_ADDRESS      0xff07
+
 class TestRunner;
 
 // 0x10000
@@ -45,28 +68,6 @@ public:
     uint8_t get_ram_bit(uint16_t address, unsigned int bit_shift);
     uint8_t set_ram_bit(uint16_t address, uint8_t bit_shift, unsigned int val);
 
-    // Video addresses
-    const uint16_t LCDC_CONTROL_ADDR = (uint16_t)0xff40; // LCD Control
-    const uint16_t LCDC_STATUS_ADDR  = (uint16_t)0xff41; // LCD status
-    const uint16_t LCDC_SCY          = (uint16_t)0xff42; // Background Scroll Y
-    const uint16_t LCDC_SCX          = (uint16_t)0xff43; // Background Scroll X
-    const uint16_t LCDC_LY_ADDR      = (uint16_t)0xff44; // Current line draw iterator
-    const uint16_t LCDC_LYC_ADDR     = (uint16_t)0xff45; // Custom location for interrupt if LY equals this
-    const uint16_t LCDC_WY_ADDR      = (uint16_t)0xff4a; // Window y position
-    const uint16_t LCDC_WX_ADDR      = (uint16_t)0xff4b; // Window x position
-    
-    // Interupts
-    const uint16_t INTERRUPT_IF_REGISTER_ADDRESS = 0xff0f; // Flags to determine that interrupt has occurred
-    const uint16_t INTERRUPT_IE_REGISTER_ADDRESS = 0xffff; // Interupt enable flags for different types of interrupts
-    const uint16_t VBLANK_INTERRUPT_PTR_ADDR = 0x0040;
-    const uint16_t LCDC_STATUS_INTERRUPT_PTR_ADDR = 0x0048;
-    const uint16_t TIMER_INTERRUPT_PTR_ADDR = 0x0050;
-
-    // Timer
-    const uint16_t DIV_TIMER_DIVIDER_ADDRESS = 0xff04;
-    const uint16_t TIMA_TIMER_COUNTER_ADDRESS = 0xff05;
-    const uint16_t TMA_TIMER_INTERRUPT_MODULO_ADDRESS = 0xff06;
-    const uint16_t TAC_TIMER_CONTROL_MEM_ADDRESS = 0xff07;
     uint16_t timer_itx;
 
 

@@ -87,21 +87,26 @@ uint16_t RAM::stack_pop(uint16_t &sp_val) {
 }
 
 void RAM::set(uint16_t address, uint8_t val) {
-    // If attempting to inc the LCD LY attribute, just
-    // reset it
-    //if (address == this->LCDC_LY_ADDR)
-    //    this->v_set(address, 0x00);
-    //else
 
-    // 0xe0 always set in IF interupt
-    if (address == this->INTERRUPT_IF_REGISTER_ADDRESS)
-        val |= 0xe0;
+    // Check for any overrides/special cases for addresses
+    switch (address) {
+//        case LCDC_LY_ADDR:
+//            // If attempting to inc the LCD LY attribute, just
+//            // reset it
+//            val = 0x00;
+//            break;
 
-    // If writing any value to div timer address, reset
-    // the internal timer
-    if (address == this->DIV_TIMER_DIVIDER_ADDRESS) {
-        this->timer_itx = 0;
-        val = 0;
+        case INTERRUPT_IF_REGISTER_ADDRESS:
+            // 0xe0 always set in IF interupt
+            val |= 0xe0;
+            break;
+            
+        case DIV_TIMER_DIVIDER_ADDRESS:
+            // If writing any value to div timer address, reset
+            // the internal timer
+            this->timer_itx = 0;
+            val = 0;
+            break;
     }
 
     this->v_set(address, val);
@@ -114,7 +119,7 @@ void RAM::v_set(uint16_t address, uint8_t val) {
     //    //raise(SIGSEGV);
     //}
 
-    if (address == this->ROM_SWAP_ADDRESS && val)
+    if (address == ROM_SWAP_ADDRESS && val)
         this->swap_boot_rom();
 
     if (DEBUG || address == DEBUG_ADDRESS)

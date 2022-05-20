@@ -310,36 +310,36 @@ void CPU::debug_post_tick()
 
 bool CPU::get_timer_state()
 {
-    return (this->ram->get_ram_bit(this->ram->TAC_TIMER_CONTROL_MEM_ADDRESS, 0x02) == 0x1);
+    return (this->ram->get_ram_bit(TAC_TIMER_CONTROL_MEM_ADDRESS, 0x02) == 0x1);
 }
 
 void CPU::increment_timer()
 {
-    unsigned int freq = this->TIMER_FREQ[this->ram->get_val(this->ram->TAC_TIMER_CONTROL_MEM_ADDRESS) & 0x03];
+    unsigned int freq = this->TIMER_FREQ[this->ram->get_val(TAC_TIMER_CONTROL_MEM_ADDRESS) & 0x03];
 
     this->ram->timer_itx ++;
 
     // Set internal divider value to top byte of internal timer
-    this->ram->v_set(this->ram->DIV_TIMER_DIVIDER_ADDRESS, (this->ram->timer_itx >> 4) & 0xff);
+    this->ram->v_set(DIV_TIMER_DIVIDER_ADDRESS, (this->ram->timer_itx >> 4) & 0xff);
 
     // If CPU count since last tick is greater/equal to CPU frequency/timer frequency
     // increment timer in mem
     if (this->ram->timer_itx >= (this->CPU_FREQ / freq))
     {
         this->ram->timer_itx = 0;
-        this->ram->v_set(this->ram->DIV_TIMER_DIVIDER_ADDRESS, 0);
-        this->ram->inc(this->ram->TIMA_TIMER_COUNTER_ADDRESS);
+        this->ram->v_set(DIV_TIMER_DIVIDER_ADDRESS, 0);
+        this->ram->inc(TIMA_TIMER_COUNTER_ADDRESS);
         
         // Check if TIMA overflowed
-        if (this->ram->get_val(this->ram->TIMA_TIMER_COUNTER_ADDRESS) == 0)
+        if (this->ram->get_val(TIMA_TIMER_COUNTER_ADDRESS) == 0)
         {
             // Set timer interrupt
-            this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 3, 1);
+            this->ram->set_ram_bit(INTERRUPT_IF_REGISTER_ADDRESS, 3, 1);
             // Reset counter value back to moduli
             this->ram->set(
-                this->ram->TIMA_TIMER_COUNTER_ADDRESS,
+                TIMA_TIMER_COUNTER_ADDRESS,
                 // Set current timer value to modulo
-                this->ram->get_val(this->ram->TMA_TIMER_INTERRUPT_MODULO_ADDRESS)
+                this->ram->get_val(TMA_TIMER_INTERRUPT_MODULO_ADDRESS)
             );
         }
     }
@@ -367,12 +367,12 @@ void CPU::print_state_m() {
 void CPU::check_interrupts() {
 
     // Check if VLBANK has been triggered and interrupt is enabled
-    if (this->ram->get_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 0) &&
-        this->ram->get_ram_bit(this->ram->INTERRUPT_IE_REGISTER_ADDRESS, 0))
+    if (this->ram->get_ram_bit(INTERRUPT_IF_REGISTER_ADDRESS, 0) &&
+        this->ram->get_ram_bit(INTERRUPT_IE_REGISTER_ADDRESS, 0))
     {
 
         // Reset interrupt user interrupt bit
-        this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 0, 0);
+        this->ram->set_ram_bit(INTERRUPT_IF_REGISTER_ADDRESS, 0, 0);
 
         if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
             std::cout << "Got VLBANK INTERRUPT!" << std::endl;
@@ -380,7 +380,7 @@ void CPU::check_interrupts() {
         // Push current pointer to stack and update PC to
         // interrupt address
         this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->ram->VBLANK_INTERRUPT_PTR_ADDR);
+        this->r_pc.set_value(VBLANK_INTERRUPT_PTR_ADDR);
 
         // Do not process any more interrupts
         return;
@@ -388,11 +388,11 @@ void CPU::check_interrupts() {
 
 
     // Check if LCD Status has been triggered and interrupt is enabled
-    if (this->ram->get_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 1) &&
-        this->ram->get_ram_bit(this->ram->INTERRUPT_IE_REGISTER_ADDRESS, 1))
+    if (this->ram->get_ram_bit(INTERRUPT_IF_REGISTER_ADDRESS, 1) &&
+        this->ram->get_ram_bit(INTERRUPT_IE_REGISTER_ADDRESS, 1))
     {
         // Reset interrupt user interrupt bit
-        this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 1, 0);
+        this->ram->set_ram_bit(INTERRUPT_IF_REGISTER_ADDRESS, 1, 0);
 
         if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
             std::cout << "Got STAT INTERRUPT!" << std::endl;
@@ -400,7 +400,7 @@ void CPU::check_interrupts() {
         // Push current pointer to stack and update PC to
         // interrupt address
         this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->ram->LCDC_STATUS_INTERRUPT_PTR_ADDR);
+        this->r_pc.set_value(LCDC_STATUS_INTERRUPT_PTR_ADDR);
 
         // Do not process any more interrupts
         return;
@@ -408,11 +408,11 @@ void CPU::check_interrupts() {
 
 
     // Check if timer has been triggered and interrupt is enabled
-    if (this->ram->get_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 2) &&
-        this->ram->get_ram_bit(this->ram->INTERRUPT_IE_REGISTER_ADDRESS, 2))
+    if (this->ram->get_ram_bit(INTERRUPT_IF_REGISTER_ADDRESS, 2) &&
+        this->ram->get_ram_bit(INTERRUPT_IE_REGISTER_ADDRESS, 2))
     {
         // Reset interrupt user interrupt bit
-        this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 2, 0);
+        this->ram->set_ram_bit(INTERRUPT_IF_REGISTER_ADDRESS, 2, 0);
 
         if (INTERRUPT_DEBUG || DEBUG || this->stepped_in)
             std::cout << "Got TIMER INTERRUPT!" << std::endl;
@@ -420,7 +420,7 @@ void CPU::check_interrupts() {
         // Push current pointer to stack and update PC to
         // interrupt address
         this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->ram->TIMER_INTERRUPT_PTR_ADDR);
+        this->r_pc.set_value(TIMER_INTERRUPT_PTR_ADDR);
         //this->stepped_in = true;
 
         return;

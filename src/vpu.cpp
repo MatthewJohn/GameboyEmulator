@@ -28,11 +28,11 @@ VPU::VPU(RAM *ram) {
     this->mode_timer_itx = 0;
 
     // Reset current line
-    this->ram->set(this->ram->LCDC_LY_ADDR, 0x00);
+    this->ram->set(LCDC_LY_ADDR, 0x00);
     this->current_lx = 0;
 
     // Reset control address value
-    this->ram->set(this->ram->LCDC_CONTROL_ADDR, 0x91);
+    this->ram->set(LCDC_CONTROL_ADDR, 0x91);
 
 	//Create Window
 
@@ -143,13 +143,13 @@ void VPU::update_mode_flag()
         mode = 0x00;
     }
     
-    if (this->get_ly() == this->ram->get_val(this->ram->LCDC_LYC_ADDR))
+    if (this->get_ly() == this->ram->get_val(LCDC_LYC_ADDR))
     {
         // Set bit 2
         mode |= 0x04;
     }
 
-    uint8_t current_mode = this->ram->get_val(this->ram->LCDC_STATUS_ADDR);
+    uint8_t current_mode = this->ram->get_val(LCDC_STATUS_ADDR);
     
     // Blank out bits 0-2
     current_mode &= 0x07;
@@ -157,7 +157,7 @@ void VPU::update_mode_flag()
     // Combine new mode flags with remainder of original flag
     current_mode |= mode;
     
-    this->ram->set(this->ram->LCDC_STATUS_ADDR, current_mode);
+    this->ram->set(LCDC_STATUS_ADDR, current_mode);
 }
 
 void VPU::increment_lx_ly()
@@ -178,7 +178,7 @@ void VPU::increment_lx_ly()
         {
             new_ly ++;
         }
-        this->ram->set(this->ram->LCDC_LY_ADDR, new_ly);
+        this->ram->set(LCDC_LY_ADDR, new_ly);
     }
     else
     {
@@ -188,7 +188,7 @@ void VPU::increment_lx_ly()
 
 void VPU::trigger_stat_interrupt()
 {
-    this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 1, 1U);
+    this->ram->set_ram_bit(INTERRUPT_IF_REGISTER_ADDRESS, 1, 1U);
 }
 
 
@@ -210,14 +210,14 @@ VpuEventType VPU::tick()
         {
             // Since this is the first mode for a line draw line,
             // check LYC=LY coincide interrupt
-            if (this->get_ly() == this->ram->get_val(this->ram->LCDC_LYC_ADDR) &&
-                this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 6) == 1)
+            if (this->get_ly() == this->ram->get_val(LCDC_LYC_ADDR) &&
+                this->ram->get_ram_bit(LCDC_STATUS_ADDR, 6) == 1)
             {
                 this->trigger_stat_interrupt();
             }
 
             // Check if STAT interrupt should be set on first tick
-            if (this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 5) == 1)
+            if (this->ram->get_ram_bit(LCDC_STATUS_ADDR, 5) == 1)
             {
                 this->trigger_stat_interrupt();
             }
@@ -243,7 +243,7 @@ VpuEventType VPU::tick()
     {
         // Check if STAT interrupt should be set on first tick
         if (this->mode_timer_itx == 0 &&
-            this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 3) == 1)
+            this->ram->get_ram_bit(LCDC_STATUS_ADDR, 3) == 1)
         {
             this->trigger_stat_interrupt();
         }
@@ -261,10 +261,10 @@ VpuEventType VPU::tick()
             return_val = this->process_events();
 
             // Trigger v-blank interrupt
-            this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 0, 1U);
+            this->ram->set_ram_bit(INTERRUPT_IF_REGISTER_ADDRESS, 0, 1U);
 
             // Check if STAT interrupt should be set on first tick
-            if (this->ram->get_ram_bit(this->ram->LCDC_STATUS_ADDR, 4) == 1)
+            if (this->ram->get_ram_bit(LCDC_STATUS_ADDR, 4) == 1)
             {
                 this->trigger_stat_interrupt();
             }
@@ -275,22 +275,22 @@ VpuEventType VPU::tick()
 }
 
 uint8_t VPU::get_background_scroll_y() {
-    return this->ram->get_val(this->ram->LCDC_SCY);
+    return this->ram->get_val(LCDC_SCY);
 }
 uint8_t VPU::get_background_scroll_x() {
-    return this->ram->get_val(this->ram->LCDC_SCX);
+    return this->ram->get_val(LCDC_SCX);
 }
 
 uint8_t VPU::lcd_enabled() {
     //return 1;
-    return this->ram->get_ram_bit(this->ram->LCDC_CONTROL_ADDR, 0x07);
+    return this->ram->get_ram_bit(LCDC_CONTROL_ADDR, 0x07);
 }
 
 uint8_t VPU::get_background_map() {
-    return this->ram->get_ram_bit(this->ram->LCDC_CONTROL_ADDR, 0x03);
+    return this->ram->get_ram_bit(LCDC_CONTROL_ADDR, 0x03);
 }
 uint8_t VPU::get_background_data_type() {
-    return this->ram->get_ram_bit(this->ram->LCDC_CONTROL_ADDR, 0x04);
+    return this->ram->get_ram_bit(LCDC_CONTROL_ADDR, 0x04);
 }
 
 vec_2d VPU::get_pixel_tile_position() {
@@ -384,7 +384,7 @@ uint8_t VPU::get_lx() {
 }
 // Return the on-screen X coornidate of the pixel being drawn
 uint8_t VPU::get_ly() {
-    return this->ram->get_val(this->ram->LCDC_LY_ADDR);
+    return this->ram->get_val(LCDC_LY_ADDR);
 }
 
 uint8_t convert_int8_uint8(uint8_t in_val) {
