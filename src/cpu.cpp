@@ -156,7 +156,7 @@ void CPU::reset_state()
         0x80, 0x3f, 0x00, 0xff, 0xbf, 0xff, 0x3f, 0x00
     };
     for (uint16_t mem_itx = 0; mem_itx < 16; mem_itx ++)
-        this->ram->set(0xff00 + mem_itx, initial_ff00_memory_values[mem_itx]);
+        this->ram->v_set(0xff00 + mem_itx, initial_ff00_memory_values[mem_itx]);
 }
 
 void CPU::execute_terminal_command(char* cmd) {

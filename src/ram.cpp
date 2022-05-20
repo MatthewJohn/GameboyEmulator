@@ -90,11 +90,11 @@ void RAM::set(uint16_t address, uint8_t val) {
 
     // Check for any overrides/special cases for addresses
     switch (address) {
-//        case LCDC_LY_ADDR:
-//            // If attempting to inc the LCD LY attribute, just
-//            // reset it
-//            val = 0x00;
-//            break;
+        case LCDC_LY_ADDR:
+            // If attempting to inc the LCD LY attribute, just
+            // reset it
+            val = 0x00;
+            break;
 
         case INTERRUPT_IF_REGISTER_ADDRESS:
             // 0xe0 always set in IF interupt

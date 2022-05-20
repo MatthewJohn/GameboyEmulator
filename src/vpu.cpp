@@ -28,11 +28,11 @@ VPU::VPU(RAM *ram) {
     this->mode_timer_itx = 0;
 
     // Reset current line
-    this->ram->set(LCDC_LY_ADDR, 0x00);
+    this->ram->v_set(LCDC_LY_ADDR, 0x00);
     this->current_lx = 0;
 
     // Reset control address value
-    this->ram->set(LCDC_CONTROL_ADDR, 0x91);
+    this->ram->v_set(LCDC_CONTROL_ADDR, 0x91);
 
 	//Create Window
 
@@ -157,7 +157,7 @@ void VPU::update_mode_flag()
     // Combine new mode flags with remainder of original flag
     current_mode |= mode;
     
-    this->ram->set(LCDC_STATUS_ADDR, current_mode);
+    this->ram->v_set(LCDC_STATUS_ADDR, current_mode);
 }
 
 void VPU::increment_lx_ly()
@@ -178,7 +178,7 @@ void VPU::increment_lx_ly()
         {
             new_ly ++;
         }
-        this->ram->set(LCDC_LY_ADDR, new_ly);
+        this->ram->v_set(LCDC_LY_ADDR, new_ly);
     }
     else
     {
