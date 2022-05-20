@@ -315,17 +315,17 @@ bool CPU::get_timer_state()
 void CPU::increment_timer()
 {
     unsigned int freq = this->TIMER_FREQ[this->ram->get_val(this->TAC_TIMER_CONTROL_MEM_ADDRESS) & 0x03];
+
     this->timer_itx ++;
-//    std::cout << "INcrmeenting timer!" << std::endl;
-//    // If CPU count since last tick is greater/equal to CPU frequency/timer frequency
+
+    // If CPU count since last tick is greater/equal to CPU frequency/timer frequency
     // increment timer in mem
     if (this->timer_itx >= (this->CPU_FREQ / freq))
     {
         this->timer_itx = 0;
         this->ram->inc(this->TIMA_TIMER_COUNTER_ADDRESS);
-        //std::cout << "Timer tick!" << std::endl;
         
-        // Check if timer overflowed
+        // Check if TIMA overflowed
         if (this->get_timer_state() && this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
         {
             // Set timer interrupt
