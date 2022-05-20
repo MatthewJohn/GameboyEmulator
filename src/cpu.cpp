@@ -319,6 +319,9 @@ void CPU::increment_timer()
 
     this->timer_itx ++;
 
+    // Set internal divider value to top byte of internal timer
+    this->ram->set(this->DIV_TIMER_DIVIDER_ADDRESS, (this->timer_itx >> 4) & 0xff);
+
     // If CPU count since last tick is greater/equal to CPU frequency/timer frequency
     // increment timer in mem
     if (this->timer_itx >= (this->CPU_FREQ / freq))
