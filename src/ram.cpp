@@ -97,6 +97,13 @@ void RAM::set(uint16_t address, uint8_t val) {
     if (address == this->INTERRUPT_IF_REGISTER_ADDRESS)
         val |= 0xe0;
 
+    // If writing any value to div timer address, reset
+    // the internal timer
+    if (address == this->DIV_TIMER_DIVIDER_ADDRESS) {
+        this->timer_itx = 0;
+        val = 0;
+    }
+
     this->v_set(address, val);
 }
 void RAM::v_set(uint16_t address, uint8_t val) {

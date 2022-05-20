@@ -81,7 +81,6 @@ protected:
     bool halt_state;
     bool cb_state;
     bool stepped_in;
-    unsigned int timer_itx;
     unsigned int op_val;
 
     union {
@@ -109,18 +108,9 @@ protected:
 
     const int CPU_FREQ = 4194304;
 
-    // Interupts  
-    const uint16_t VBLANK_INTERRUPT_PTR_ADDR = 0x0040;
-    
-    const uint16_t LCDC_STATUS_INTERRUPT_PTR_ADDR = 0x0048;
-
     // Timer config
     const unsigned int TIMER_FREQ[4] = {4096, 262144, 65536, 16384};
-    const uint16_t DIV_TIMER_DIVIDER_ADDRESS = 0xff04;
-    const uint16_t TIMA_TIMER_COUNTER_ADDRESS = 0xff05;
-    const uint16_t TMA_TIMER_INTERRUPT_MODULO_ADDRESS = 0xff06;
-    const uint16_t TAC_TIMER_CONTROL_MEM_ADDRESS = 0xff07;
-    const uint16_t TIMER_INTERRUPT_PTR_ADDR = 0x0050;
+
 
     // Registers
     //  Accumulator

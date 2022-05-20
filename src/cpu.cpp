@@ -135,7 +135,7 @@ void CPU::reset_state()
     this->h_blank_executed = false;
 
     this->cb_state = false;
-    this->timer_itx = 0;
+    this->ram->timer_itx = 0;
 
     this->interrupt_state = this->INTERRUPT_STATE::DISABLED;
     this->halt_state = false;
@@ -310,35 +310,36 @@ void CPU::debug_post_tick()
 
 bool CPU::get_timer_state()
 {
-    return (this->ram->get_ram_bit(this->TAC_TIMER_CONTROL_MEM_ADDRESS, 0x02) == 0x1);
+    return (this->ram->get_ram_bit(this->ram->TAC_TIMER_CONTROL_MEM_ADDRESS, 0x02) == 0x1);
 }
 
 void CPU::increment_timer()
 {
-    unsigned int freq = this->TIMER_FREQ[this->ram->get_val(this->TAC_TIMER_CONTROL_MEM_ADDRESS) & 0x03];
+    unsigned int freq = this->TIMER_FREQ[this->ram->get_val(this->ram->TAC_TIMER_CONTROL_MEM_ADDRESS) & 0x03];
 
-    this->timer_itx ++;
+    this->ram->timer_itx ++;
 
     // Set internal divider value to top byte of internal timer
-    this->ram->set(this->DIV_TIMER_DIVIDER_ADDRESS, (this->timer_itx >> 4) & 0xff);
+    this->ram->v_set(this->ram->DIV_TIMER_DIVIDER_ADDRESS, (this->ram->timer_itx >> 4) & 0xff);
 
     // If CPU count since last tick is greater/equal to CPU frequency/timer frequency
     // increment timer in mem
-    if (this->timer_itx >= (this->CPU_FREQ / freq))
+    if (this->ram->timer_itx >= (this->CPU_FREQ / freq))
     {
-        this->timer_itx = 0;
-        this->ram->inc(this->TIMA_TIMER_COUNTER_ADDRESS);
+        this->ram->timer_itx = 0;
+        this->ram->v_set(this->ram->DIV_TIMER_DIVIDER_ADDRESS, 0);
+        this->ram->inc(this->ram->TIMA_TIMER_COUNTER_ADDRESS);
         
         // Check if TIMA overflowed
-        if (this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
+        if (this->ram->get_val(this->ram->TIMA_TIMER_COUNTER_ADDRESS) == 0)
         {
             // Set timer interrupt
             this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 3, 1);
             // Reset counter value back to moduli
             this->ram->set(
-                this->TIMA_TIMER_COUNTER_ADDRESS,
+                this->ram->TIMA_TIMER_COUNTER_ADDRESS,
                 // Set current timer value to modulo
-                this->ram->get_val(this->TMA_TIMER_INTERRUPT_MODULO_ADDRESS)
+                this->ram->get_val(this->ram->TMA_TIMER_INTERRUPT_MODULO_ADDRESS)
             );
         }
     }
@@ -379,7 +380,7 @@ void CPU::check_interrupts() {
         // Push current pointer to stack and update PC to
         // interrupt address
         this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->VBLANK_INTERRUPT_PTR_ADDR);
+        this->r_pc.set_value(this->ram->VBLANK_INTERRUPT_PTR_ADDR);
 
         // Do not process any more interrupts
         return;
@@ -399,7 +400,7 @@ void CPU::check_interrupts() {
         // Push current pointer to stack and update PC to
         // interrupt address
         this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->LCDC_STATUS_INTERRUPT_PTR_ADDR);
+        this->r_pc.set_value(this->ram->LCDC_STATUS_INTERRUPT_PTR_ADDR);
 
         // Do not process any more interrupts
         return;
@@ -419,7 +420,8 @@ void CPU::check_interrupts() {
         // Push current pointer to stack and update PC to
         // interrupt address
         this->ram->stack_push(this->r_sp.get_pointer(), this->r_pc.get_value());
-        this->r_pc.set_value(this->TIMER_INTERRUPT_PTR_ADDR);
+        this->r_pc.set_value(this->ram->TIMER_INTERRUPT_PTR_ADDR);
+        //this->stepped_in = true;
 
         return;
     }

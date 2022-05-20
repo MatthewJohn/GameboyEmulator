@@ -55,9 +55,20 @@ public:
     const uint16_t LCDC_WY_ADDR      = (uint16_t)0xff4a; // Window y position
     const uint16_t LCDC_WX_ADDR      = (uint16_t)0xff4b; // Window x position
     
-        // Interupts
+    // Interupts
     const uint16_t INTERRUPT_IF_REGISTER_ADDRESS = 0xff0f; // Flags to determine that interrupt has occurred
     const uint16_t INTERRUPT_IE_REGISTER_ADDRESS = 0xffff; // Interupt enable flags for different types of interrupts
+    const uint16_t VBLANK_INTERRUPT_PTR_ADDR = 0x0040;
+    const uint16_t LCDC_STATUS_INTERRUPT_PTR_ADDR = 0x0048;
+    const uint16_t TIMER_INTERRUPT_PTR_ADDR = 0x0050;
+
+    // Timer
+    const uint16_t DIV_TIMER_DIVIDER_ADDRESS = 0xff04;
+    const uint16_t TIMA_TIMER_COUNTER_ADDRESS = 0xff05;
+    const uint16_t TMA_TIMER_INTERRUPT_MODULO_ADDRESS = 0xff06;
+    const uint16_t TAC_TIMER_CONTROL_MEM_ADDRESS = 0xff07;
+    uint16_t timer_itx;
+
 
 private:
     // @TODO Reduce this to exclude mappings to other
