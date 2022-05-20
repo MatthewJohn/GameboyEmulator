@@ -12,6 +12,7 @@
 #include "ram.h"
 #define DEBUG 0
 #define STACK_DEBUG 0
+#define DEBUG_ADDRESS 0xff0f
 
 RAM::RAM() {
     // Initialise memory to 0.
@@ -109,8 +110,9 @@ void RAM::v_set(uint16_t address, uint8_t val) {
     if (address == this->ROM_SWAP_ADDRESS && val)
         this->swap_boot_rom();
 
-    if (DEBUG)
+    if (DEBUG || address == DEBUG_ADDRESS)
         std::cout << std::hex << "Set RAM value (" << address << "): "  << (int)val << std::endl;
+
     this->memory[address] = val;
 }
 uint8_t RAM::dec(uint16_t address) {
