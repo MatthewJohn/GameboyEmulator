@@ -333,8 +333,8 @@ void CPU::increment_timer()
             // Reset counter value back to moduli
             this->ram->set(
                 this->TIMA_TIMER_COUNTER_ADDRESS,
-                // Perform XOR with 0xff to convert timer modulus to start value
-                0xff ^ this->ram->get_val(this->TMA_TIMER_INTERRUPT_MODULO_ADDRESS)
+                // Set current timer value to modulo
+                this->ram->get_val(this->TMA_TIMER_INTERRUPT_MODULO_ADDRESS)
             );
         }
     }
