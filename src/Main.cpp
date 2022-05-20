@@ -115,7 +115,7 @@ int main(int argc, char *args[])
     
     // Tests
     // 01-special.gb - passed!
-    // 02-interrupts.gb - hangs
+    // 02-interrupts.gb - fails
     // 03-op sp,hl.gb - passed
     // 04-op r,imm.gb - passed
     // 05-op rp.gb - passed
