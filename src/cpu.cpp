@@ -205,8 +205,9 @@ void CPU::tick() {
             std::cin.get();
         }
     }
-    
-    this->increment_timer();
+
+    if (this->get_timer_state())
+        this->increment_timer();
     
     // Check for interrupts if internal state is true
     if (this->interrupt_state == this->INTERRUPT_STATE::ENABLED ||
@@ -326,7 +327,7 @@ void CPU::increment_timer()
         this->ram->inc(this->TIMA_TIMER_COUNTER_ADDRESS);
         
         // Check if TIMA overflowed
-        if (this->get_timer_state() && this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
+        if (this->ram->get_val(this->TIMA_TIMER_COUNTER_ADDRESS) == 0)
         {
             // Set timer interrupt
             this->ram->set_ram_bit(this->ram->INTERRUPT_IF_REGISTER_ADDRESS, 3, 1);
