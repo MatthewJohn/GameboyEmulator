@@ -91,7 +91,12 @@ void RAM::set(uint16_t address, uint8_t val) {
     //if (address == this->LCDC_LY_ADDR)
     //    this->v_set(address, 0x00);
     //else
-        this->v_set(address, val);
+
+    // 0xe0 always set in IF interupt
+    if (address == this->INTERRUPT_IF_REGISTER_ADDRESS)
+        val |= 0xe0;
+
+    this->v_set(address, val);
 }
 void RAM::v_set(uint16_t address, uint8_t val) {
     //if (address < 0x4000) {
