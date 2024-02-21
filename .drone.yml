@@ -6,13 +6,7 @@ name: default
 steps:
 - name: build
   image: fare-docker-reg.dock.studios:5000/docker-images/cpp-static-code-analysis:latest
-  environment:
-    ARTIFACT_USERNAME:
-      from_secret: ARTIFACT_USERNAME
-    ARTIFACT_PASSWORD:
-      from_secret: ARTIFACT_PASSWORD
-    ARTIFACT_BASE_URL:
-      from_secret: ARTIFACT_BASE_URL
+  secrets: [ARTIFACT_USERNAME, ARTIFACT_PASSWORD, ARTIFACT_BASE_URL]
   commands:
   - cmake .
   - make clean all
@@ -32,4 +26,5 @@ steps:
   - bash ./tests/system/09-op_r,r.sh
   - bash ./tests/system/10-bit_ops.sh
   - bash ./tests/system/11-op_a,-hl.sh
+
 
