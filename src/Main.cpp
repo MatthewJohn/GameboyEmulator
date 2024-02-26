@@ -22,7 +22,7 @@
 
 int main(int argc, char *args[])
 {
-    arguments_t arguments = {0, 0, 0, 0};
+    arguments_t arguments = {{0, 0, 0, 0}};
 
 
     for(;;)
